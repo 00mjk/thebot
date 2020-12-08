@@ -101,7 +101,7 @@ class Voice(cmd.Cog):
         await ctx.send(
             embed=discord.Embed(
                 title="Voice link created",
-                description=f"Members who connect to {wrap_in_code(voice_channel)} will now get access to {text_channel.mention}.",
+                description=f"Members who connect to {wrap_in_code(voice_channel.name)} will now get access to {text_channel.mention}.",
             )
         )
 
@@ -126,7 +126,7 @@ class Voice(cmd.Cog):
 
         message = f"{channel.mention} is no longer associated with any voice channels."
         if isinstance(channel, discord.VoiceChannel):
-            message = f"Members who connect to {wrap_in_code(channel)} will no longer get access to extra channels."
+            message = f"Members who connect to {wrap_in_code(channel.name)} will no longer get access to extra channels."
 
         await ctx.send(
             embed=discord.Embed(title="Voice link deleted", description=message)
