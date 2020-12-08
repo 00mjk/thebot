@@ -66,7 +66,7 @@ class HelpCommand(commands.HelpCommand):
 
             for command in commands:
                 description.append(
-                    f"{self.get_command_signature(command)}: {command.help}"
+                    f"{self.get_command_signature(command)}: {command.short_doc}"
                 )
 
             paginator.add_field(

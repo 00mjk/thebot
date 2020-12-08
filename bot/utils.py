@@ -1,6 +1,7 @@
 import re
 from typing import Optional, Union
 
+import discord
 from discord.ext import commands
 
 from bot import cmd
@@ -44,3 +45,21 @@ def get_command_signature(
         signature += f" {command.signature}".replace("_", " ")
 
     return wrap_in_code(signature)
+
+
+async def patch_overwrites(
+    channel: discord.abc.GuildChannel,
+    target: Union[discord.Role, discord.Member],
+    *,
+    reason=None,
+    **permissions,
+):
+    overwrites = channel.overwrites_for(target)
+
+    overwrites.update(**permissions)
+
+    await channel.set_permissions(
+        target,
+        reason=reason,
+        overwrite=overwrites if not overwrites.is_empty() else None,
+    )

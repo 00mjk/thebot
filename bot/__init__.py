@@ -14,6 +14,7 @@ initial_extensions = (
     "bot.ext.errors",
     "bot.ext.meta",
     "bot.ext.help",
+    "bot.ext.voice",
 )
 
 
@@ -30,6 +31,7 @@ class Bot(commands.AutoShardedBot):
                 messages=True,
                 emojis=True,
                 reactions=True,
+                voice_states=True,
             ),
             member_cache_flags=discord.MemberCacheFlags.none(),
             max_messages=None,
