@@ -373,10 +373,10 @@ class Roles(cmd.Cog):
         )
         embed.add_field(
             name="Examples",
-            value=f"{nominative.capitalize()} went to the park yesterday. "
-            f"I saw {accusative} when walking home from the store, "
-            f"as {nominative} were eating {pronominal_possessive} lunch. "
-            f"I was hungry, so I asked if I could take a small bite of {predicative_possessive}. "
+            value=f"{nominative.capitalize()} went to the park yesterday.\n"
+            f"I saw {accusative} when walking home from the store,\n"
+            f"as {nominative} were eating {pronominal_possessive} lunch.\n"
+            f"I was hungry, so I asked if I could take a small bite of {predicative_possessive}.\n"
             f"Sadly, {nominative} wouldn't have enough left for {reflexive}.",
             inline=False,
         )
