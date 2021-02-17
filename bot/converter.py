@@ -37,31 +37,26 @@ class PartialEmojiConverter(commands.PartialEmojiConverter):
         try:
             emoji_id = int(argument)
 
-            async with ctx.bot.session as client:
-                gif_url = str(
-                    discord.Asset(ctx.bot._connection, f"/emojis/{emoji_id}.gif")
-                )
-                png_url = str(
-                    discord.Asset(ctx.bot._connection, f"/emojis/{emoji_id}.png")
-                )
+            gif_url = str(discord.Asset(ctx.bot._connection, f"/emojis/{emoji_id}.gif"))
+            png_url = str(discord.Asset(ctx.bot._connection, f"/emojis/{emoji_id}.png"))
 
-                async with client.head(gif_url) as resp:
-                    if resp.ok:
-                        return discord.PartialEmoji.with_state(
-                            ctx.bot._connection,
-                            id=int(argument),
-                            name="unknown",
-                            animated=True,
-                        )
+            async with ctx.bot.session.head(gif_url) as resp:
+                if resp.status == 200:
+                    return discord.PartialEmoji.with_state(
+                        ctx.bot._connection,
+                        id=int(argument),
+                        name="unknown",
+                        animated=True,
+                    )
 
-                async with client.head(png_url) as resp:
-                    if resp.ok:
-                        return discord.PartialEmoji.with_state(
-                            ctx.bot._connection,
-                            id=int(argument),
-                            name="unknown",
-                            animated=False,
-                        )
+            async with ctx.bot.session.head(png_url) as resp:
+                if resp.status == 200:
+                    return discord.PartialEmoji.with_state(
+                        ctx.bot._connection,
+                        id=int(argument),
+                        name="unknown",
+                        animated=False,
+                    )
 
         except ValueError:
             pass
