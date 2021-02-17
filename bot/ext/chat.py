@@ -242,7 +242,12 @@ class Chat(cmd.Cog):
             return
 
         for linked_message in linked_messages[:3]:
-            author = await message.guild.fetch_member(linked_message.author.id)
+            author = message.author
+            try:
+                author = await message.guild.fetch_member(linked_message.author.id)
+            except discord.NotFound:
+                pass
+
             embed = discord.Embed(
                 description=linked_message.content,
                 timestamp=linked_message.created_at,
@@ -250,6 +255,7 @@ class Chat(cmd.Cog):
             )
             embed.set_author(name=str(author), icon_url=str(author.avatar_url))
             embed.set_footer(text=f"Sent in #{message.channel.name}")
+
             if len(linked_message.attachments) > 0:
                 attachment = linked_message.attachments[0]
                 if not attachment.height or attachment.is_spoiler():
