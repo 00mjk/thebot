@@ -7,7 +7,6 @@ from discord.utils import get
 # format: written, nominative, accusative, pronominal possessive, predicative possessive, reflexive
 pronoun_list = [
     ("any pronoun", "*any*", "*any*", "*any*", "*any*", "*any*"),
-    ("no pronouns", "[name]", "[name]", "[name]'s", "[name]'s", "[name]"),
     ("they/them", "they", "them", "their", "theirs", "themselves"),
     ("she/her", "she", "her", "her", "hers", "herself"),
     ("he/him", "he", "him", "his", "his", "himself"),
@@ -29,6 +28,7 @@ pronoun_list = [
     ("ze/hir", "ze", "hir", "hir", "hirs", "hirself"),
     ("zie/zir", "zie", "zir", "zir", "zirs", "zirself"),
     ("zie/zim", "zie", "zim", "zir", "zirs", "zirself"),
+    ("no pronouns", "[name]", "[name]", "[name]'s", "[name]'s", "[name]"),
 ]
 
 
