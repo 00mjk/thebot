@@ -37,6 +37,17 @@ class Emoji(cmd.Cog):
     ):
         """Steals an emoji from another server"""
 
+        if len(ctx.guild.emojis) >= ctx.guild.emoji_limit:
+            emoji_type = "animated emojis" if emoji.animated else "emojis"
+
+            await ctx.send(
+                embed=discord.Embed(
+                    title="Emoji limit reached",
+                    description=f"You can't add more than {ctx.guild.emoji_limit} {emoji_type}.",
+                )
+            )
+            return
+
         image_data = None
 
         if emoji.animated is None:
