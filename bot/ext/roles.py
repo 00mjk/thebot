@@ -74,7 +74,7 @@ class Roles(cmd.Cog):
 
         in_db = await ctx.bot.pool.fetchval(
             """
-            SELECT ANY(selfrole) = $1 FROM guild_config
+            SELECT $1 = ANY(selfrole) FROM guild_config
             WHERE guild_id = $2
             """,
             role.id,
@@ -114,7 +114,7 @@ class Roles(cmd.Cog):
 
         in_db = await ctx.bot.pool.fetchval(
             """
-            SELECT ANY(selfrole) = $1 FROM guild_config
+            SELECT $1 = ANY(selfrole) FROM guild_config
             WHERE guild_id = $2
             """,
             role.id,
@@ -233,7 +233,7 @@ class Roles(cmd.Cog):
 
         in_db = await ctx.bot.pool.fetchval(
             """
-            SELECT ANY(selfrole) = $1 FROM guild_config
+            SELECT $1 = ANY(selfrole) FROM guild_config
             WHERE guild_id = $2
             """,
             role.id,
