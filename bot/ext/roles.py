@@ -93,7 +93,7 @@ class Roles(cmd.Cog):
         await ctx.bot.pool.execute(
             """
             UPDATE guild_config
-            SET selfrole = selfrole || $1
+            SET selfrole = array_append(selfrole, $1)
             WHERE guild_id = $2
             """,
             role.id,
