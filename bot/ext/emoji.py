@@ -69,6 +69,40 @@ class Emoji(cmd.Cog):
 
         await ctx.send_help("emojilock")
 
+    @emojilock.command(name="list")
+    @commands.cooldown(3, 8, commands.BucketType.guild)
+    @commands.has_guild_permissions(manage_emojis=True)
+    @commands.bot_has_guild_permissions(manage_emojis=True)
+    async def emojilock_list(self, ctx: cmd.Context, emoji: discord.Emoji):
+        """Lists which roles have access to an emoji"""
+
+        if emoji.guild != ctx.guild:
+            await ctx.send(
+                embed=discord.Embed(
+                    title="Emoji role",
+                    description=f"This emoji is from another server.",
+                )
+            )
+            return
+
+        if len(emoji.roles) > 0:
+            await ctx.send(
+                embed=discord.Embed(
+                    title="Emoji role",
+                    description=f"{emoji} can only be used by:\n"
+                    + ", ".join(map(lambda role: role.mention, emoji.roles))
+                    + ".",
+                )
+            )
+            return
+
+        await ctx.send(
+            embed=discord.Embed(
+                title="Emoji role",
+                description=f"{emoji} can only be used by everyone",
+            )
+        )
+
     @emojilock.command(name="add")
     @commands.cooldown(3, 8, commands.BucketType.guild)
     @commands.has_guild_permissions(manage_emojis=True)
