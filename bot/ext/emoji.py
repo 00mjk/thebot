@@ -26,8 +26,8 @@ class Emoji(cmd.Cog):
 
     @commands.command()
     @commands.cooldown(3, 8, commands.BucketType.guild)
-    @commands.has_guild_permissions(manage_emoji=True)
-    @commands.bot_has_guild_permissions(manage_emoji=True)
+    @commands.has_guild_permissions(manage_emojis=True)
+    @commands.bot_has_guild_permissions(manage_emojis=True)
     async def steal(
         self, ctx: cmd.Context, *, emoji: PartialEmojiConverter, name: str = None
     ):
@@ -58,8 +58,8 @@ class Emoji(cmd.Cog):
 
     @commands.group(invoke_without_command=True)
     @commands.cooldown(3, 8, commands.BucketType.guild)
-    @commands.has_guild_permissions(manage_emoji=True)
-    @commands.bot_has_guild_permissions(manage_emoji=True)
+    @commands.has_guild_permissions(manage_emojis=True)
+    @commands.bot_has_guild_permissions(manage_emojis=True)
     async def emojilock(self, ctx: cmd.Context):
         """Locks certain emoji to given roles only"""
 
@@ -67,8 +67,8 @@ class Emoji(cmd.Cog):
 
     @emojilock.command(name="add")
     @commands.cooldown(3, 8, commands.BucketType.guild)
-    @commands.has_guild_permissions(manage_emoji=True)
-    @commands.bot_has_guild_permissions(manage_emoji=True)
+    @commands.has_guild_permissions(manage_emojis=True)
+    @commands.bot_has_guild_permissions(manage_emojis=True)
     async def emojilock_add(
         self, ctx: cmd.Context, emoji: discord.Emoji, *, role: discord.Role
     ):
@@ -102,8 +102,8 @@ class Emoji(cmd.Cog):
 
     @emojilock.command(name="remove")
     @commands.cooldown(3, 8, commands.BucketType.guild)
-    @commands.has_guild_permissions(manage_emoji=True)
-    @commands.bot_has_guild_permissions(manage_emoji=True)
+    @commands.has_guild_permissions(manage_emojis=True)
+    @commands.bot_has_guild_permissions(manage_emojis=True)
     async def emojilock_remove(
         self, ctx: cmd.Context, emoji: discord.Emoji, *, role: discord.Role
     ):
@@ -137,8 +137,8 @@ class Emoji(cmd.Cog):
 
     @emojilock.command(name="clear")
     @commands.cooldown(3, 8, commands.BucketType.guild)
-    @commands.has_guild_permissions(manage_emoji=True)
-    @commands.bot_has_guild_permissions(manage_emoji=True)
+    @commands.has_guild_permissions(manage_emojis=True)
+    @commands.bot_has_guild_permissions(manage_emojis=True)
     async def emojilock_clear(self, ctx: cmd.Context, *, emoji: discord.Emoji):
         """Give everyone access to use an emoji"""
 
