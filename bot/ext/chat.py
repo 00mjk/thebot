@@ -131,10 +131,11 @@ class Chat(cmd.Cog):
                     nicknames_changed += 1
                     await member.edit(nick=new_nick)
 
+        plural_nickname = "nickname" if nicknames_changed == 1 else "nicknames"
         await ctx.send(
             embed=discord.Embed(
                 title="Nickname",
-                description=f"Successfully dehoisted {nicknames_changed} nicknames.",
+                description=f"Successfully cleaned up {nicknames_changed} {plural_nickname}.",
             )
         )
 
@@ -165,10 +166,11 @@ class Chat(cmd.Cog):
                     nicknames_changed += 1
                     await member.edit(nick=new_nick)
 
+        plural_nickname = "nickname" if nicknames_changed == 1 else "nicknames"
         await ctx.send(
             embed=discord.Embed(
                 title="Nickname",
-                description=f"Successfully dehoisted {nicknames_changed} nicknames.",
+                description=f"Successfully dehoisted {nicknames_changed} {plural_nickname}.",
             )
         )
 
@@ -199,10 +201,11 @@ class Chat(cmd.Cog):
                     nicknames_changed += 1
                     await member.edit(nick=new_nick)
 
+        plural_nickname = "nickname" if nicknames_changed == 1 else "nicknames"
         await ctx.send(
             embed=discord.Embed(
                 title="Nickname",
-                description=f"Successfully normalized {nicknames_changed} nicknames.",
+                description=f"Successfully normalized {nicknames_changed} {plural_nickname}.",
             )
         )
 
