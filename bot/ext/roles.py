@@ -37,7 +37,7 @@ pronoun_list = [
 
 def pronouns_enabled():
     async def extended_check(ctx):
-        await commands.guild_only().predicate()
+        await commands.guild_only().predicate(ctx)
 
         enabled = await ctx.bot.pool.fetchval(
             """
