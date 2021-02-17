@@ -107,6 +107,9 @@ class Chat(cmd.Cog):
 
         async with ctx.typing():
             async for member in ctx.guild.fetch_members(limit=None):
+                if member.bot:
+                    continue
+
                 new_nick = ""
                 for char in member.display_name:
                     if not new_nick and ord(char) < ord("0"):
@@ -136,6 +139,9 @@ class Chat(cmd.Cog):
 
         async with ctx.typing():
             async for member in ctx.guild.fetch_members(limit=None):
+                if member.bot:
+                    continue
+
                 normalized = unicodedata.normalize("NFKC", member.display_name)
                 new_nick = ""
                 for char in normalized:
