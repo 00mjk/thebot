@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 from discord.utils import get
 
@@ -33,6 +34,16 @@ class PartialEmojiConverter(commands.PartialEmojiConverter):
     """
 
     async def convert(self, ctx: cmd.Context, argument):
+        try:
+            return discord.PartialEmoji.with_state(
+                ctx.bot._connection,
+                id=int(argument),
+                name="unknown",
+                animated=None,
+            )
+        except ValueError:
+            pass
+
         try:
             return await super().convert(ctx, argument)
         except commands.PartialEmojiConversionFailure:

@@ -1,41 +1,7 @@
-import itertools
-import typing
-
 import discord
-from bot import cmd
-from bot.utils import wrap_in_code
+from bot import cmd, converter
 from discord.ext import commands
 from discord.utils import escape_markdown, get
-
-
-class PartialEmojiConverter(commands.PartialEmojiConverter):
-    """Converts to a :class:`~discord.PartialEmoji`.
-    Different from `discord.ext.commands.converter.PartialEmojiConverter` by
-    falling back to getting emoji by name from the guild.
-    """
-
-    async def convert(self, ctx: cmd.Context, argument):
-        try:
-            return discord.PartialEmoji.with_state(
-                ctx.bot._connection,
-                id=int(argument),
-                name="unknown",
-                animated=None,
-            )
-        except ValueError:
-            pass
-
-        try:
-            return await super().convert(ctx, argument)
-        except commands.PartialEmojiConversionFailure:
-            if not ctx.guild:
-                raise
-
-            guild_emoji = get(ctx.guild.emojis, name=argument.strip(":"))
-            if guild_emoji is None:
-                guild_emoji = get(ctx.guild.emojis, id=argument)
-
-            return await super().convert(ctx, str(guild_emoji or argument))
 
 
 class Emoji(cmd.Cog):
@@ -43,7 +9,7 @@ class Emoji(cmd.Cog):
 
     @commands.command(aliases=["emote"])
     @commands.cooldown(3, 8, commands.BucketType.channel)
-    async def emoji(self, ctx: cmd.Context, *, emoji: PartialEmojiConverter):
+    async def emoji(self, ctx: cmd.Context, *, emoji: converter.PartialEmojiConverter):
         """Shows info about an emoji"""
 
         embed = discord.Embed(

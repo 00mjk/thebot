@@ -1,6 +1,3 @@
-import itertools
-import typing
-
 import discord
 from bot import cmd
 from bot.utils import get_command_signature, wrap_in_code
