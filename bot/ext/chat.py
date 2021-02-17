@@ -80,15 +80,13 @@ class Chat(cmd.Cog):
             return
 
         for linked_message in linked_messages[:3]:
+            author = await message.guild.fetch_member(linked_message.author.id)
             embed = discord.Embed(
                 description=linked_message.content,
                 timestamp=linked_message.created_at,
-                colour=linked_message.author.colour.value or discord.Embed.Empty,
+                colour=author.colour.value or discord.Embed.Empty,
             )
-            embed.set_author(
-                name=str(linked_message.author),
-                icon_url=str(linked_message.author.avatar_url),
-            )
+            embed.set_author(name=str(author), icon_url=str(author.avatar_url))
             embed.set_footer(text=f"Sent in #{message.channel.name}")
             if len(linked_message.attachments) > 0:
                 attachment = linked_message.attachments[0]
