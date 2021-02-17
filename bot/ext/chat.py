@@ -25,7 +25,7 @@ class Chat(cmd.Cog):
                 ctx.guild.id,
             )
 
-            enabled_str = "will" if enable else "will not"
+            enabled_str = "will" if enabled else "will not"
             await ctx.send(
                 embed=discord.Embed(
                     title="Embed messages",
