@@ -95,12 +95,54 @@ class Chat(cmd.Cog):
                 )
             )
 
-    @commands.command()
-    @commands.cooldown(1, 60, commands.BucketType.guild)
+    @commands.group(invoke_without_command=True)
+    @commands.cooldown(3, 8, commands.BucketType.channel)
+    async def nick(self, ctx: cmd.Context):
+        """Commands used to clean up member nicknames"""
+
+        await ctx.send_help("nick")
+
+    @nick.command(name="clean")
     @commands.max_concurrency(1, commands.BucketType.guild)
     @commands.has_guild_permissions(manage_nicknames=True)
     @commands.bot_has_guild_permissions(manage_nicknames=True)
-    async def dehoist(self, ctx: cmd.Context):
+    async def nick_clean(self, ctx: cmd.Context):
+        """Cleans up nicknames for members in the server"""
+
+        nicknames_changed = 0
+
+        async with ctx.typing():
+            async for member in ctx.guild.fetch_members(limit=None):
+                if member.bot:
+                    continue
+
+                normalized = unicodedata.normalize("NFKC", member.display_name)
+                new_nick = ""
+                for char in normalized:
+                    if not new_nick and ord(char) < ord("0"):
+                        continue
+                    if unicodedata.combining(char) == 0:
+                        new_nick += char
+
+                if not new_nick:
+                    new_nick = "dehoisted"
+
+                if member.display_name != new_nick:
+                    nicknames_changed += 1
+                    await member.edit(nick=new_nick)
+
+        await ctx.send(
+            embed=discord.Embed(
+                title="Nickname",
+                description=f"Successfully dehoisted {nicknames_changed} nicknames.",
+            )
+        )
+
+    @nick.command(name="dehoist")
+    @commands.max_concurrency(1, commands.BucketType.guild)
+    @commands.has_guild_permissions(manage_nicknames=True)
+    @commands.bot_has_guild_permissions(manage_nicknames=True)
+    async def nick_dehoist(self, ctx: cmd.Context):
         """Dehoists nicknames for members in the server"""
 
         nicknames_changed = 0
@@ -125,17 +167,16 @@ class Chat(cmd.Cog):
 
         await ctx.send(
             embed=discord.Embed(
-                title="Dehoist",
+                title="Nickname",
                 description=f"Successfully dehoisted {nicknames_changed} nicknames.",
             )
         )
 
-    @commands.command(aliases=["normalise"])
-    @commands.cooldown(1, 60, commands.BucketType.guild)
+    @nick.command(name="normalize", aliases=["normalise"])
     @commands.max_concurrency(1, commands.BucketType.guild)
     @commands.has_guild_permissions(manage_nicknames=True)
     @commands.bot_has_guild_permissions(manage_nicknames=True)
-    async def normalize(self, ctx: cmd.Context):
+    async def nick_normalize(self, ctx: cmd.Context):
         """Normalize nicknames for members in the server"""
 
         nicknames_changed = 0
@@ -160,7 +201,7 @@ class Chat(cmd.Cog):
 
         await ctx.send(
             embed=discord.Embed(
-                title="Normalize",
+                title="Nickname",
                 description=f"Successfully normalized {nicknames_changed} nicknames.",
             )
         )
