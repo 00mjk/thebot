@@ -55,7 +55,7 @@ class Chat(cmd.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         conv = converter.MessageConverter()
-        ctx = message.bot.get_context(message, cls=cmd.Context)
+        ctx = self.bot.get_context(message, cls=cmd.Context)
         linked_messages = None
         for word in message.content.split():
             try:
@@ -65,7 +65,7 @@ class Chat(cmd.Cog):
         if len(linked_messages) == 0:
             return
 
-        embed_messages = await message.bot.pool.fetchval(
+        embed_messages = await self.bot.pool.fetchval(
             """
             SELECT embed_messages FROM guild_config
             WHERE guild_id = $1
