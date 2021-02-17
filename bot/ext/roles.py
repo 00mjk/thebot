@@ -66,6 +66,86 @@ class Roles(cmd.Cog):
 
         await ctx.send_help("selfrole")
 
+    @selfrole.command(name="add")
+    @commands.cooldown(3, 8, commands.BucketType.guild)
+    @commands.has_guild_permissions(manage_roles=True)
+    async def selfrole_add(self, ctx: cmd.Context, *, role: discord.Role):
+        """Adds a role to the list of self-assignable roles"""
+
+        in_db = await ctx.bot.pool.fetchval(
+            """
+            SELECT ANY(selfrole) = $1 FROM guild_config
+            WHERE guild_id = $2
+            """,
+            role.id,
+            ctx.guild.id,
+        )
+
+        if in_db:
+            await ctx.send(
+                embed=discord.Embed(
+                    title="Selfroles",
+                    description=f"{role.mention} already was self-assignable.",
+                )
+            )
+            return
+
+        await ctx.bot.pool.execute(
+            """
+            UPDATE guild_config
+            SET selfrole = selfrole || $1
+            WHERE guild_id = $2
+            """,
+            role.id,
+            ctx.guild.id,
+        )
+        await ctx.send(
+            embed=discord.Embed(
+                title="Selfroles",
+                description=f"{role.mention} is now self-assignable.",
+            )
+        )
+
+    @selfrole.command(name="remove")
+    @commands.cooldown(3, 8, commands.BucketType.guild)
+    @commands.has_guild_permissions(manage_roles=True)
+    async def selfrole_remove(self, ctx: cmd.Context, *, role: discord.Role):
+        """Removes a role to the list of self-assignable roles"""
+
+        in_db = await ctx.bot.pool.fetchval(
+            """
+            SELECT ANY(selfrole) = $1 FROM guild_config
+            WHERE guild_id = $2
+            """,
+            role.id,
+            ctx.guild.id,
+        )
+
+        if not in_db:
+            await ctx.send(
+                embed=discord.Embed(
+                    title="Selfroles",
+                    description=f"{role.mention} already was not self-assignable.",
+                )
+            )
+            return
+
+        await ctx.bot.pool.execute(
+            """
+            UPDATE guild_config
+            SET selfrole = array_remove(selfrole, $1)
+            WHERE guild_id = $2
+            """,
+            role.id,
+            ctx.guild.id,
+        )
+        await ctx.send(
+            embed=discord.Embed(
+                title="Selfroles",
+                description=f"{role.mention} is now no longer self-assignable.",
+            )
+        )
+
     @selfrole.command(name="pronoun")
     @commands.cooldown(3, 8, commands.BucketType.guild)
     @commands.has_guild_permissions(manage_roles=True)
@@ -108,6 +188,83 @@ class Roles(cmd.Cog):
                 description=f"Self assignable pronoun roles are now {enabled_str}.",
             )
         )
+
+    @commands.command()
+    @commands.cooldown(3, 8, commands.BucketType.channel)
+    @commands.has_guild_permissions(manage_roles=True)
+    async def selfroles(self, ctx: cmd.Context):
+        """Lists all self-assignable roles"""
+
+        role_ids = await ctx.bot.pool.fetchval(
+            """
+            SELECT selfrole FROM guild_config
+            WHERE guild_id = $1
+            """,
+            ctx.guild.id,
+        )
+        role_ids_in_db = len(role_ids)
+
+        role_ids = {rid for rid in role_ids if not ctx.guild.get_role(rid)}
+
+        if len(role_ids) != role_ids_in_db:
+            await ctx.bot.pool.execute(
+                """
+                UPDATE guild_config
+                SET selfrole = $1
+                WHERE guild_id = $2
+                """,
+                list(role_ids),
+                ctx.guild.id,
+            )
+
+        await ctx.send(
+            embed=discord.Embed(
+                title="Selfroles",
+                description="These are the roles you can assign to yourself:\n"
+                + ", ".join(map(lambda id: f"<@&{id}?", role_ids)),
+            )
+        )
+
+    @commands.command(aliases=["iam"])
+    @commands.cooldown(3, 8, commands.BucketType.member)
+    @commands.bot_has_guild_permissions(manage_roles=True)
+    async def assign(self, ctx: cmd.Context, *, role: discord.Role):
+        """Toggles a self-assignable role on you"""
+
+        in_db = await ctx.bot.pool.fetchval(
+            """
+            SELECT ANY(selfrole) = $1 FROM guild_config
+            WHERE guild_id = $2
+            """,
+            role.id,
+            ctx.guild.id,
+        )
+
+        if not in_db:
+            await ctx.send(
+                embed=discord.Embed(
+                    title="Selfroles",
+                    description=f"{role.mention} is not self-assignable.",
+                )
+            )
+            return
+
+        if role not in ctx.author.roles:
+            await ctx.author.add_roles(role)
+            await ctx.send(
+                embed=discord.Embed(
+                    title="Selfroles",
+                    description=f"You have been assigned {role.mention}.",
+                )
+            )
+        else:
+            await ctx.author.remove_roles(role)
+            await ctx.send(
+                embed=discord.Embed(
+                    title="Selfroles",
+                    description=f"You have been unassigned {role.mention}.",
+                )
+            )
 
     @commands.command()
     @commands.cooldown(3, 8, commands.BucketType.member)
