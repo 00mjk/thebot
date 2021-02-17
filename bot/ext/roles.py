@@ -118,7 +118,8 @@ class Roles(cmd.Cog):
 
         selected_pronoun = None
 
-        for (written_form,) in pronoun_list:
+        for entry in pronoun_list:
+            written_form = entry[0]
             if pronoun == written_form or pronoun == written_form.split("/")[0]:
                 selected_pronoun = written_form
                 break
