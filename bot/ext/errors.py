@@ -25,6 +25,10 @@ bad_arg_converter_messages = {
         "title": "Not a number",
         "description": "The argument could not be converted to an integer value.",
     },
+    "float": {
+        "title": "Not a number",
+        "description": "The argument could not be converted to a number value.",
+    },
 }
 
 
