@@ -54,6 +54,9 @@ class Chat(cmd.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
+        if not message.guild:
+            return
+
         conv = converter.MessageConverter()
         ctx = self.bot.get_context(message, cls=cmd.Context)
         linked_messages = []
