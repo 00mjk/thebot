@@ -48,7 +48,7 @@ class Chat(cmd.Cog):
         await ctx.send(
             embed=discord.Embed(
                 title="Embed messages",
-                description=f"Message links sent in chat will {enabled_str} embed.",
+                description=f"Message links sent in chat {enabled_str} embed.",
             )
         )
 
