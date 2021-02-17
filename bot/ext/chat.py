@@ -13,7 +13,7 @@ class Chat(cmd.Cog):
     @commands.command()
     @commands.cooldown(3, 8, commands.BucketType.guild)
     @commands.has_guild_permissions(manage_messages=True)
-    async def embedmessage(self, ctx: cmd.Context, enable: bool):
+    async def embedmessage(self, ctx: cmd.Context, enable: bool = None):
         """Toggles whether or not I should embed message links"""
 
         if enable is None:
