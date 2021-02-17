@@ -99,7 +99,7 @@ class Emoji(cmd.Cog):
         await ctx.send(
             embed=discord.Embed(
                 title="Emoji role",
-                description=f"{emoji} can only be used by everyone",
+                description=f"{emoji} can be used by everyone.",
             )
         )
 
