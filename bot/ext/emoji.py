@@ -1,3 +1,5 @@
+import re
+
 import discord
 from bot import cmd, converter
 from discord.ext import commands
@@ -24,6 +26,8 @@ class Emoji(cmd.Cog):
 
         await ctx.send(embed=embed)
 
+    emoji_name_re = re.compile(r"\w{2,32}")
+
     @commands.command()
     @commands.cooldown(3, 8, commands.BucketType.guild)
     @commands.has_guild_permissions(manage_emojis=True)
@@ -44,6 +48,15 @@ class Emoji(cmd.Cog):
                 embed=discord.Embed(
                     title="Emoji limit reached",
                     description=f"You can't add more than {ctx.guild.emoji_limit} {emoji_type}.",
+                )
+            )
+            return
+
+        if not self.emoji_name_re.fullmatch(name):
+            await ctx.send(
+                embed=discord.Embed(
+                    title="Emoji name invalid",
+                    description=f"The emoji name can only include `a-z`, `A-Z`, `0-9`, and `_`.",
                 )
             )
             return
