@@ -225,7 +225,7 @@ class Roles(cmd.Cog):
             inline=False,
         )
 
-        await ctx.send(embed)
+        await ctx.send(embed=embed)
 
 
 def setup(bot: commands.Bot):
