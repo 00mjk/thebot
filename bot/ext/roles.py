@@ -188,7 +188,6 @@ class Roles(cmd.Cog):
 
     @commands.command()
     @commands.cooldown(3, 8, commands.BucketType.channel)
-    @commands.has_guild_permissions(manage_roles=True)
     async def selfroles(self, ctx: cmd.Context):
         """Lists all self-assignable roles"""
 
