@@ -25,7 +25,7 @@ class Bot(commands.AutoShardedBot):
     def __init__(self):
         super().__init__(
             command_prefix=self.get_prefix_list,
-            description="General purpose bot",
+            description="General purpose utility do it all bot",
             help_command=None,
             activity=discord.Game(name=";help"),
             allowed_mentions=discord.AllowedMentions.none(),
