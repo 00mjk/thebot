@@ -56,7 +56,7 @@ class Chat(cmd.Cog):
     async def on_message(self, message: discord.Message):
         conv = converter.MessageConverter()
         ctx = self.bot.get_context(message, cls=cmd.Context)
-        linked_messages = None
+        linked_messages = []
         for word in message.content.split():
             try:
                 linked_messages.append(await conv.convert(ctx, word))
