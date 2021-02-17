@@ -14,10 +14,10 @@ class Emoji(cmd.Cog):
 
         embed = discord.Embed(
             title=f"Emoji info",
-            description=f"Name: {escape_markdown(emoji.name)}"
-            f"\nID: {emoji.id}"
+            description=f"Name: `{emoji.name}`"
+            f"\nID: `{emoji.id}`"
             f"\nAnimated: {'yes' if emoji.animated else 'no'}"
-            f"\nMarkdown: {str(emoji).strip('<>')}"
+            f"\nMarkdown: `{str(emoji).strip('<>')}`"
             f"\nImage: {emoji.url}",
         )
         embed.set_image(url=emoji.url)
