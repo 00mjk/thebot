@@ -4,7 +4,7 @@ import discord
 from bot import cmd, converter
 from bot.utils import wrap_in_code
 from discord.ext import commands
-from discord.utils import get
+from discord.utils import escape_markdown, get
 
 
 class Chat(cmd.Cog):
@@ -90,6 +90,15 @@ class Chat(cmd.Cog):
                 icon_url=str(linked_message.author.avatar_url),
             )
             embed.set_footer(text=f"Sent in #{message.channel.name}")
+            if len(linked_message.attachments) > 0:
+                attachment = linked_message.attachments[0]
+                if not attachment.height or attachment.is_spoiler():
+                    embed.add_field(
+                        name="File",
+                        value=f"[{escape_markdown(attachment.filename)}]({attachment.url})",
+                    )
+                else:
+                    embed.set_image(url=linked_message.attachments[0].url)
 
             await message.reply(f"> {linked_message.jump_url}", embed=embed)
 
