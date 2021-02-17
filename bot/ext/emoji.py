@@ -29,7 +29,11 @@ class Emoji(cmd.Cog):
     @commands.has_guild_permissions(manage_emojis=True)
     @commands.bot_has_guild_permissions(manage_emojis=True)
     async def steal(
-        self, ctx: cmd.Context, *, emoji: PartialEmojiConverter, name: str = None
+        self,
+        ctx: cmd.Context,
+        *,
+        emoji: converter.PartialEmojiConverter,
+        name: str = None,
     ):
         """Steals an emoji from another server"""
 
