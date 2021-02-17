@@ -204,7 +204,7 @@ class Roles(cmd.Cog):
         )
         role_ids_in_db = len(role_ids)
 
-        role_ids = {rid for rid in role_ids if not ctx.guild.get_role(rid)}
+        role_ids = {rid for rid in role_ids if ctx.guild.get_role(rid)}
 
         if len(role_ids) != role_ids_in_db:
             await ctx.bot.pool.execute(
