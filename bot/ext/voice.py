@@ -11,21 +11,10 @@ from discord.utils import get
 class Voice(cmd.Cog):
     """Voice chat helpers"""
 
-    @commands.group(invoke_without_command=True)
+    @commands.command()
     @commands.cooldown(3, 8, commands.BucketType.channel)
     @commands.has_permissions(manage_roles=True)
-    async def voicelink(self, ctx: cmd.Context):
-        """Group of commands to manage voice links
-
-        Voice links allow hiding text channels that are related to voice channels to keep unwanted noise out.
-        """
-
-        await ctx.send_help("voicelink")
-
-    @voicelink.command(name="list")
-    @commands.cooldown(3, 8, commands.BucketType.channel)
-    @commands.has_permissions(manage_roles=True)
-    async def voicelink_list(self, ctx: cmd.Context):
+    async def voicelinks(self, ctx: cmd.Context):
         """Lists existing links between voice and text channels"""
 
         links = await self.bot.pool.fetch(
@@ -55,10 +44,10 @@ class Voice(cmd.Cog):
 
         await paginator.send(ctx)
 
-    @voicelink.command(name="create", aliases=["new", "add"])
+    @commands.command()
     @commands.cooldown(3, 8, commands.BucketType.channel)
     @commands.has_permissions(manage_roles=True)
-    async def voicelink_create(
+    async def voicelink(
         self,
         ctx: cmd.Context,
         text_channel: discord.TextChannel,
@@ -105,10 +94,10 @@ class Voice(cmd.Cog):
             )
         )
 
-    @voicelink.command(name="delete", aliases=["remove"])
+    @commands.command()
     @commands.cooldown(3, 8, commands.BucketType.channel)
     @commands.has_permissions(manage_roles=True)
-    async def voicelink_delete(
+    async def voiceunlink(
         self,
         ctx: cmd.Context,
         *,
