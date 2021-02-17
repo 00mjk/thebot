@@ -52,6 +52,39 @@ class Chat(cmd.Cog):
             )
         )
 
+    @commands.command()
+    @commands.cooldown(3, 8, commands.BucketType.channel)
+    @commands.has_permissions(manage_channels=True)
+    @commands.bot_has_permissions(manage_channels=True)
+    async def slowmode(self, ctx: cmd.Context, seconds: int):
+        """Edits slowmode to a precise number of seconds"""
+
+        if seconds > 21600:
+            await ctx.send(
+                embed=discord.Embed(
+                    title="Slowmode",
+                    description=f"Slow mode cannot be longer than 21600 seconds.",
+                )
+            )
+            return
+        if seconds < 0:
+            await ctx.send(
+                embed=discord.Embed(
+                    title="Slowmode",
+                    description=f"Warping back in time is impossible.",
+                )
+            )
+            return
+
+        await ctx.channel.edit(slowmode_delay=seconds)
+
+        await ctx.send(
+            embed=discord.Embed(
+                title="Slowmode",
+                description=f"Slow mode in this channel is now set to {seconds} seconds.",
+            )
+        )
+
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         if not message.guild or message.author.bot:
