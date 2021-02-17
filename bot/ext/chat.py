@@ -78,12 +78,21 @@ class Chat(cmd.Cog):
 
         await ctx.channel.edit(slowmode_delay=seconds)
 
-        await ctx.send(
-            embed=discord.Embed(
-                title="Slowmode",
-                description=f"Slow mode in this channel is now set to {seconds} seconds.",
+        if seconds > 0:
+            second_plural = "second" if seconds == 1 else "seconds"
+            await ctx.send(
+                embed=discord.Embed(
+                    title="Slowmode",
+                    description=f"Slow mode in this channel is now set to {seconds} {second_plural}.",
+                )
             )
-        )
+        else:
+            await ctx.send(
+                embed=discord.Embed(
+                    title="Slowmode",
+                    description=f"Slow mode in this channel is now disabled.",
+                )
+            )
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
