@@ -165,6 +165,10 @@ class Chat(cmd.Cog):
             )
         )
 
+    message_link_re = re.compile(
+        r"https?://(?:(ptb|canary|www)\.)?discord(?:app)?\.com/channels/\d+/\d+/\d+"
+    )
+
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         if not message.guild or message.author.bot:
@@ -174,10 +178,11 @@ class Chat(cmd.Cog):
         ctx = await self.bot.get_context(message, cls=cmd.Context)
         linked_messages = []
         for word in message.content.split():
-            try:
-                linked_messages.append(await conv.convert(ctx, word))
-            except:
-                pass
+            if self.message_link_re.fullmatch(word):
+                try:
+                    linked_messages.append(await conv.convert(ctx, word))
+                except:
+                    pass
         if len(linked_messages) == 0:
             return
 
