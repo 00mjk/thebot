@@ -100,7 +100,7 @@ class Chat(cmd.Cog):
                 else:
                     embed.set_image(url=linked_message.attachments[0].url)
 
-            await message.reply(f"> {linked_message.jump_url}", embed=embed)
+            await message.reply(embed=embed)
 
         if len(linked_messages) > 3:
             message_plural = "message" if len(linked_messages) == 4 else "messages"
