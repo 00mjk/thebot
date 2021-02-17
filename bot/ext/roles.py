@@ -385,8 +385,8 @@ class Roles(cmd.Cog):
 
     @commands.command()
     @commands.cooldown(1, 60, commands.BucketType.guild)
-    @commands.has_guild_permission(manage_guild=True)
-    @commands.bot_has_guild_permission(manage_guild=True)
+    @commands.has_guild_permissions(manage_guild=True)
+    @commands.bot_has_guild_permissions(manage_guild=True)
     async def sync(self, ctx: cmd.Context):
         """Syncs integrations like Twitch subscribers and YouTube members"""
 
