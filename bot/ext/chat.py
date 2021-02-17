@@ -80,11 +80,15 @@ class Chat(cmd.Cog):
             return
 
         for linked_message in linked_messages[:3]:
-            embed = discord.Embed(description=linked_message.content)
+            embed = discord.Embed(
+                description=linked_message.content,
+                timestamp=linked_message.created_at,
+            )
             embed.set_author(
                 name=str(linked_message.author),
                 icon_url=str(linked_message.author.avatar_url),
             )
+            embed.set_footer(text=f"Sent in #{message.channel.name}")
 
             await message.reply(f"> {linked_message.jump_url}", embed=embed)
 
