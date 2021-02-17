@@ -383,6 +383,25 @@ class Roles(cmd.Cog):
 
         await ctx.send(embed=embed)
 
+    @commands.command()
+    @commands.cooldown(1, 60, commands.BucketType.guild)
+    @commands.has_guild_permission(manage_guild=True)
+    @commands.bot_has_guild_permission(manage_guild=True)
+    async def sync(self, ctx: cmd.Context):
+        """Syncs integrations like Twitch subscribers and YouTube members"""
+
+        integrations = await ctx.guild.integrations()
+        for integration in integrations:
+            await integration.sync()
+
+        await ctx.send(
+            embed=discord.Embed(
+                title="Sync",
+                description="Synced all integrations:\n"
+                + "\n".join(map(lambda i: f"{i.type}: {i.name}", integrations)),
+            )
+        )
+
 
 def setup(bot: commands.Bot):
     voice = Roles(bot)
