@@ -86,7 +86,7 @@ class Roles(cmd.Cog):
                 embed=discord.Embed(
                     title="Pronoun selfrole",
                     description=f"Self assignable pronoun roles are currently {enabled_str}."
-                    f"\nUse {get_command_signature(self.selfrole_pronoun)} to change this.",
+                    f"\nUse {get_command_signature(ctx, self.selfrole_pronoun)} to change this.",
                 )
             )
             return
@@ -129,7 +129,7 @@ class Roles(cmd.Cog):
                 embed=discord.Embed(
                     title="Pronoun selfrole",
                     description=f"Could not find pronoun for {wrap_in_code(pronoun)}. "
-                    f"Use {get_command_signature(self.pronounlist)} to see all available pronouns.",
+                    f"Use {get_command_signature(ctx, self.pronounlist)} to see all available pronouns.",
                 )
             )
             return
@@ -193,7 +193,7 @@ class Roles(cmd.Cog):
                 embed=discord.Embed(
                     title="Pronoun info",
                     description=f"Could not find pronoun for {wrap_in_code(pronoun)}. "
-                    f"Use {get_command_signature(self.pronounlist)} to see all available pronouns.",
+                    f"Use {get_command_signature(ctx, self.pronounlist)} to see all available pronouns.",
                 )
             )
             return
