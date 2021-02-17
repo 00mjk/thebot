@@ -143,7 +143,22 @@ class Roles(cmd.Cog):
         if not role:
             role = await ctx.guild.create_role(name=selected_pronoun)
 
-        await ctx.author.add_roles(role)
+        if role not in ctx.author.roles:
+            await ctx.author.add_roles(role)
+            await ctx.send(
+                embed=discord.Embed(
+                    title="Pronoun selfrole",
+                    description=f"Assigned pronoun role {written_form}.",
+                )
+            )
+        else:
+            await ctx.author.remove_roles(role)
+            await ctx.send(
+                embed=discord.Embed(
+                    title="Pronoun selfrole",
+                    description=f"Unassigned pronoun role {written_form}.",
+                )
+            )
 
     @commands.command()
     @commands.cooldown(3, 8, commands.BucketType.channel)
