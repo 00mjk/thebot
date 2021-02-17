@@ -31,8 +31,8 @@ class Emoji(cmd.Cog):
     async def steal(
         self,
         ctx: cmd.Context,
-        *,
         emoji: converter.PartialEmojiConverter,
+        *,
         name: str = None,
     ):
         """Steals an emoji from another server"""
