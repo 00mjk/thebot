@@ -16,6 +16,7 @@ initial_extensions = (
     "bot.ext.help",
     "bot.ext.roles",
     "bot.ext.voice",
+    "bot.ext.emoji",
 )
 
 
