@@ -10,7 +10,6 @@ from discord.ext import commands
 
 ignored_errors = [
     commands.CommandNotFound,
-    commands.DisabledCommand,
     commands.NotOwner,
 ]
 
@@ -52,6 +51,11 @@ error_types = [
         commands.TooManyArguments,
         "Too many arguments",
         "Too many arguments were provided, please read help for more info.",
+    ),
+    (
+        commands.DisabledCommand,
+        "Command disabled",
+        "This command is disabled for this server",
     ),
     (
         commands.MessageNotFound,

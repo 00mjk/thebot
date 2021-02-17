@@ -14,6 +14,7 @@ initial_extensions = (
     "bot.ext.errors",
     "bot.ext.meta",
     "bot.ext.help",
+    "bot.ext.roles",
     "bot.ext.voice",
 )
 
