@@ -58,7 +58,7 @@ def pronouns_enabled():
 class Roles(cmd.Cog):
     """Role related commands"""
 
-    @commands.group(invoke_without_subcommand=True)
+    @commands.group(invoke_without_command=True)
     @commands.cooldown(3, 8, commands.BucketType.guild)
     @commands.has_guild_permissions(manage_roles=True)
     async def selfrole(self, ctx: cmd.Context):
@@ -97,7 +97,7 @@ class Roles(cmd.Cog):
             SET selfrole_pronoun = $1
             WHERE guild_id = $2
             """,
-            enabled,
+            enable,
             ctx.guild.id,
         )
 
