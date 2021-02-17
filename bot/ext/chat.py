@@ -83,7 +83,7 @@ class Chat(cmd.Cog):
             embed = discord.Embed(description=linked_message.content)
             embed.set_author(
                 name=str(linked_message.author),
-                icon_url=str(linked_message.author.icon_url),
+                icon_url=str(linked_message.author.avatar_url),
             )
 
             await message.reply(f"> {linked_message.jump_url}", embed=embed)
