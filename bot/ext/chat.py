@@ -254,7 +254,7 @@ class Chat(cmd.Cog):
                 colour=author.colour.value or discord.Embed.Empty,
             )
             embed.set_author(name=str(author), icon_url=str(author.avatar_url))
-            embed.set_footer(text=f"Sent in #{message.channel.name}")
+            embed.set_footer(text=f"Sent in #{linked_message.channel.name}")
 
             if len(linked_message.attachments) > 0:
                 attachment = linked_message.attachments[0]
