@@ -127,7 +127,7 @@ class Chat(cmd.Cog):
             )
         )
 
-    @commands.command()
+    @commands.command(aliases=["normalise"])
     @commands.cooldown(1, 60, commands.BucketType.guild)
     @commands.max_concurrency(1, commands.BucketType.guild)
     @commands.has_guild_permissions(manage_nicknames=True)
