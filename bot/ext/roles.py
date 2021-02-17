@@ -391,6 +391,16 @@ class Roles(cmd.Cog):
         """Syncs integrations like Twitch subscribers and YouTube members"""
 
         integrations = await ctx.guild.integrations()
+
+        if len(integrations) == 0:
+            await ctx.send(
+                embed=discord.Embed(
+                    title="Sync",
+                    description="This server does not have any integrations.",
+                )
+            )
+            return
+
         for integration in integrations:
             await integration.sync()
 
