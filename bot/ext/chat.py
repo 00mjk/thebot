@@ -116,6 +116,9 @@ class Chat(cmd.Cog):
                         continue
                     new_nick += char
 
+                if not new_nick:
+                    new_nick = "dehoisted"
+
                 if member.display_name != new_nick:
                     nicknames_changed += 1
                     await member.edit(nick=new_nick)
@@ -147,6 +150,9 @@ class Chat(cmd.Cog):
                 for char in normalized:
                     if unicodedata.combining(char) == 0:
                         new_nick += char
+
+                if not new_nick:
+                    new_nick = "bad name"
 
                 if member.display_name != new_nick:
                     nicknames_changed += 1
