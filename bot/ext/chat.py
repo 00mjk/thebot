@@ -83,6 +83,7 @@ class Chat(cmd.Cog):
             embed = discord.Embed(
                 description=linked_message.content,
                 timestamp=linked_message.created_at,
+                colour=linked_message.author.colour.value or None,
             )
             embed.set_author(
                 name=str(linked_message.author),
