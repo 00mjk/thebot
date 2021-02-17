@@ -100,7 +100,7 @@ class Chat(cmd.Cog):
     @commands.max_concurrency(1, commands.BucketType.guild)
     @commands.has_guild_permissions(manage_nicknames=True)
     @commands.bot_has_guild_permissions(manage_nicknames=True)
-    async def dehoist(self, ctx: cmd.Context, normalize: bool = False):
+    async def dehoist(self, ctx: cmd.Context):
         """Dehoists nicknames for members in the server"""
 
         nicknames_changed = 0
@@ -132,7 +132,7 @@ class Chat(cmd.Cog):
     @commands.max_concurrency(1, commands.BucketType.guild)
     @commands.has_guild_permissions(manage_nicknames=True)
     @commands.bot_has_guild_permissions(manage_nicknames=True)
-    async def normalize(self, ctx: cmd.Context, normalize: bool = False):
+    async def normalize(self, ctx: cmd.Context):
         """Normalize nicknames for members in the server"""
 
         nicknames_changed = 0
