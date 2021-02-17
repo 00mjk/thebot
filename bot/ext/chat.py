@@ -242,7 +242,7 @@ class Chat(cmd.Cog):
             return
 
         for linked_message in linked_messages[:3]:
-            author = message.author
+            author = linked_message.author
             try:
                 author = await message.guild.fetch_member(linked_message.author.id)
             except discord.NotFound:
