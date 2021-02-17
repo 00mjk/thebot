@@ -112,7 +112,7 @@ class Roles(cmd.Cog):
     @commands.command()
     @commands.cooldown(3, 8, commands.BucketType.member)
     @commands.bot_has_guild_permissions(manage_roles=True)
-    @pronouns_enabled
+    @pronouns_enabled()
     async def pronoun(self, ctx: cmd.Context, *, pronoun: str):
         """Assigns or unassigns a pronoun role"""
 
@@ -146,7 +146,7 @@ class Roles(cmd.Cog):
 
     @commands.command()
     @commands.cooldown(3, 8, commands.BucketType.channel)
-    @pronouns_enabled
+    @pronouns_enabled()
     async def pronounlist(self, ctx: cmd.Context):
         """Lists all pronouns available for self assignment"""
 
@@ -160,7 +160,7 @@ class Roles(cmd.Cog):
 
     @commands.command()
     @commands.cooldown(3, 8, commands.BucketType.channel)
-    @pronouns_enabled
+    @pronouns_enabled()
     async def pronouninfo(self, ctx: cmd.Context, *, pronoun: str):
         """Gives examples on how to use a pronoun"""
 
