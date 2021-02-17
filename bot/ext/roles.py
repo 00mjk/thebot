@@ -58,15 +58,15 @@ class Roles(cmd.Cog):
     @commands.group(invoke_without_command=True)
     @commands.cooldown(3, 8, commands.BucketType.guild)
     @commands.has_guild_permissions(manage_roles=True)
-    async def selfrole(self, ctx: cmd.Context):
+    async def roleconfig(self, ctx: cmd.Context):
         """Manages selfroles setup for this server"""
 
-        await ctx.send_help("selfrole")
+        await ctx.send_help("roleconfig")
 
-    @selfrole.command(name="add")
+    @roleconfig.command(name="add")
     @commands.cooldown(3, 8, commands.BucketType.guild)
     @commands.has_guild_permissions(manage_roles=True)
-    async def selfrole_add(self, ctx: cmd.Context, *, role: discord.Role):
+    async def roleconfig_add(self, ctx: cmd.Context, *, role: discord.Role):
         """Adds a role to the list of self-assignable roles"""
 
         in_db = await ctx.bot.pool.fetchval(
@@ -103,10 +103,10 @@ class Roles(cmd.Cog):
             )
         )
 
-    @selfrole.command(name="remove")
+    @roleconfig.command(name="remove")
     @commands.cooldown(3, 8, commands.BucketType.guild)
     @commands.has_guild_permissions(manage_roles=True)
-    async def selfrole_remove(self, ctx: cmd.Context, *, role: discord.Role):
+    async def roleconfig_remove(self, ctx: cmd.Context, *, role: discord.Role):
         """Removes a role to the list of self-assignable roles"""
 
         in_db = await ctx.bot.pool.fetchval(
@@ -143,10 +143,10 @@ class Roles(cmd.Cog):
             )
         )
 
-    @selfrole.command(name="pronoun")
+    @roleconfig.command(name="pronoun")
     @commands.cooldown(3, 8, commands.BucketType.guild)
     @commands.has_guild_permissions(manage_roles=True)
-    async def selfrole_pronoun(self, ctx: cmd.Context, enable: bool = None):
+    async def roleconfig_pronoun(self, ctx: cmd.Context, enable: bool = None):
         """Gets or sets if pronoun selfroles are enabled"""
 
         if enable is None:
