@@ -221,7 +221,7 @@ class Roles(cmd.Cog):
             embed=discord.Embed(
                 title="Selfroles",
                 description="These are the roles you can assign to yourself:\n"
-                + ", ".join(map(lambda id: f"<@&{id}?", role_ids)),
+                + ", ".join(map(lambda id: f"<@&{id}>", role_ids)),
             )
         )
 
