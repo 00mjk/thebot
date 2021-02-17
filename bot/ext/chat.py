@@ -58,7 +58,7 @@ class Chat(cmd.Cog):
             return
 
         conv = converter.MessageConverter()
-        ctx = self.bot.get_context(message, cls=cmd.Context)
+        ctx = await self.bot.get_context(message, cls=cmd.Context)
         linked_messages = []
         for word in message.content.split():
             try:
