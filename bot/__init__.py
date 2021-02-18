@@ -28,7 +28,12 @@ class Bot(commands.AutoShardedBot):
             description="General purpose utility do it all bot",
             help_command=None,
             activity=discord.Game(name=";help"),
-            allowed_mentions=discord.AllowedMentions.none(),
+            allowed_mentions=discord.AllowedMentions(
+                everyone=False,
+                roles=False,
+                users=False,
+                replied_user=True,
+            ),
             intents=discord.Intents(
                 guilds=True,
                 messages=True,
