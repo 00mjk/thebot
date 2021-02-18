@@ -266,12 +266,16 @@ class Chat(cmd.Cog):
                 else:
                     embed.set_image(url=linked_message.attachments[0].url)
 
-            await message.reply(embed=embed)
+            await message.reply(
+                embed=embed,
+                allowed_mentions=discord.AllowedMentions.none(),
+            )
 
         if len(linked_messages) > 3:
             message_plural = "message" if len(linked_messages) == 4 else "messages"
             await message.reply(
-                f"Aborted embedding {len(linked_messages) - 3} more {message_plural}."
+                f"Aborted embedding {len(linked_messages) - 3} more {message_plural}.",
+                allowed_mentions=discord.AllowedMentions.none(),
             )
 
 
