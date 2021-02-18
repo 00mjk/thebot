@@ -1,4 +1,5 @@
 import re
+import typing
 
 import discord
 from bot import cmd, converter
@@ -27,6 +28,7 @@ class Emoji(cmd.Cog):
         await ctx.reply(embed=embed)
 
     emoji_name_re = re.compile(r"\w{2,32}")
+    emoji_md_re = re.compile(r"<(a?):([a-zA-Z0-9\_]+):([0-9]+)>")
 
     @commands.command()
     @commands.cooldown(3, 8, commands.BucketType.guild)
@@ -35,11 +37,43 @@ class Emoji(cmd.Cog):
     async def steal(
         self,
         ctx: cmd.Context,
-        emoji: converter.PartialEmojiConverter,
+        emoji_or_message: typing.Union[
+            converter.PartialEmojiConverter, discord.Message
+        ],
         *,
         name: str = None,
     ):
         """Steals an emoji from another server"""
+
+        emoji = None
+        if isinstance(emoji_or_message, (discord.Emoji, discord.PartialEmoji)):
+            emoji = emoji_or_message
+        else:
+            matches = set(self.emoji_md_re.findall(emoji_or_message.content))
+            if len(matches) > 1:
+                await ctx.send(
+                    embed=discord.Embed(
+                        title="Ambiguous",
+                        description="The message contained more than one emoji.",
+                    )
+                )
+                return
+            if len(matches) == 0:
+                await ctx.send(
+                    embed=discord.Embed(
+                        title="Not found",
+                        description="The given message did not contain an emoji.",
+                    )
+                )
+                return
+
+            animated, name, emoji_id = matches.pop()
+            emoji = discord.PartialEmoji.with_state(
+                ctx.bot._connection,
+                animated=bool(animated),
+                name=name,
+                id=int(emoji_id),
+            )
 
         if len(ctx.guild.emojis) >= ctx.guild.emoji_limit:
             emoji_type = "animated emojis" if emoji.animated else "emojis"
