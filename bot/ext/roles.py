@@ -61,7 +61,7 @@ class Roles(cmd.Cog):
     async def roleconfig(self, ctx: cmd.Context):
         """Manages selfroles setup for this server"""
 
-        await ctx.send_help("roleconfig")
+        await ctx.reply_help("roleconfig")
 
     @roleconfig.command(name="add")
     @commands.cooldown(3, 8, commands.BucketType.guild)
@@ -79,7 +79,7 @@ class Roles(cmd.Cog):
         )
 
         if in_db:
-            await ctx.send(
+            await ctx.reply(
                 embed=discord.Embed(
                     title="Selfroles",
                     description=f"{role.mention} already was self-assignable.",
@@ -96,7 +96,7 @@ class Roles(cmd.Cog):
             role.id,
             ctx.guild.id,
         )
-        await ctx.send(
+        await ctx.reply(
             embed=discord.Embed(
                 title="Selfroles",
                 description=f"{role.mention} is now self-assignable.",
@@ -119,7 +119,7 @@ class Roles(cmd.Cog):
         )
 
         if not in_db:
-            await ctx.send(
+            await ctx.reply(
                 embed=discord.Embed(
                     title="Selfroles",
                     description=f"{role.mention} already was not self-assignable.",
@@ -136,7 +136,7 @@ class Roles(cmd.Cog):
             role.id,
             ctx.guild.id,
         )
-        await ctx.send(
+        await ctx.reply(
             embed=discord.Embed(
                 title="Selfroles",
                 description=f"{role.mention} is now no longer self-assignable.",
@@ -159,7 +159,7 @@ class Roles(cmd.Cog):
             )
 
             enabled_str = "enabled" if enabled else "disabled"
-            await ctx.send(
+            await ctx.reply(
                 embed=discord.Embed(
                     title="Pronoun selfrole",
                     description=f"Self assignable pronoun roles are currently {enabled_str}."
@@ -179,7 +179,7 @@ class Roles(cmd.Cog):
         )
 
         enabled_str = "enabled" if enable else "disabled"
-        await ctx.send(
+        await ctx.reply(
             embed=discord.Embed(
                 title="Pronoun selfrole",
                 description=f"Self assignable pronoun roles are now {enabled_str}.",
@@ -213,7 +213,7 @@ class Roles(cmd.Cog):
                 ctx.guild.id,
             )
 
-        await ctx.send(
+        await ctx.reply(
             embed=discord.Embed(
                 title="Selfroles",
                 description="These are the roles you can assign to yourself:\n"
@@ -238,7 +238,7 @@ class Roles(cmd.Cog):
         )
 
         if not in_db:
-            await ctx.send(
+            await ctx.reply(
                 embed=discord.Embed(
                     title="Selfroles",
                     description=f"{role.mention} is not self-assignable.",
@@ -248,7 +248,7 @@ class Roles(cmd.Cog):
 
         if role not in ctx.author.roles:
             await ctx.author.add_roles(role)
-            await ctx.send(
+            await ctx.reply(
                 embed=discord.Embed(
                     title="Selfroles",
                     description=f"You have been assigned {role.mention}.",
@@ -256,7 +256,7 @@ class Roles(cmd.Cog):
             )
         else:
             await ctx.author.remove_roles(role)
-            await ctx.send(
+            await ctx.reply(
                 embed=discord.Embed(
                     title="Selfroles",
                     description=f"You have been unassigned {role.mention}.",
@@ -279,7 +279,7 @@ class Roles(cmd.Cog):
                 break
 
         if not selected_pronoun:
-            await ctx.send(
+            await ctx.reply(
                 embed=discord.Embed(
                     title="Pronoun selfrole",
                     description=f"Could not find pronoun for {wrap_in_code(pronoun)}. "
@@ -299,7 +299,7 @@ class Roles(cmd.Cog):
 
         if role not in ctx.author.roles:
             await ctx.author.add_roles(role)
-            await ctx.send(
+            await ctx.reply(
                 embed=discord.Embed(
                     title="Pronoun selfrole",
                     description=f"Assigned pronoun role {written_form}.",
@@ -307,7 +307,7 @@ class Roles(cmd.Cog):
             )
         else:
             await ctx.author.remove_roles(role)
-            await ctx.send(
+            await ctx.reply(
                 embed=discord.Embed(
                     title="Pronoun selfrole",
                     description=f"Unassigned pronoun role {written_form}.",
@@ -319,7 +319,7 @@ class Roles(cmd.Cog):
     async def pronounlist(self, ctx: cmd.Context):
         """Lists all pronouns available for self assignment"""
 
-        await ctx.send(
+        await ctx.reply(
             embed=discord.Embed(
                 title="Pronoun list",
                 description=f"List of pronouns known to me are:\n"
@@ -342,7 +342,7 @@ class Roles(cmd.Cog):
                 break
 
         if not selected_pronoun:
-            await ctx.send(
+            await ctx.reply(
                 embed=discord.Embed(
                     title="Pronoun info",
                     description=f"Could not find pronoun for {wrap_in_code(pronoun)}. "
@@ -378,7 +378,7 @@ class Roles(cmd.Cog):
             inline=False,
         )
 
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed)
 
     @commands.command()
     @commands.cooldown(1, 60, commands.BucketType.guild)
@@ -390,7 +390,7 @@ class Roles(cmd.Cog):
         integrations = await ctx.guild.integrations()
 
         if len(integrations) == 0:
-            await ctx.send(
+            await ctx.reply(
                 embed=discord.Embed(
                     title="Sync",
                     description="This server does not have any integrations.",
@@ -401,7 +401,7 @@ class Roles(cmd.Cog):
         for integration in integrations:
             await integration.sync()
 
-        await ctx.send(
+        await ctx.reply(
             embed=discord.Embed(
                 title="Sync",
                 description="Synced all integrations:\n"

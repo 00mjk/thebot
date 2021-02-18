@@ -27,7 +27,7 @@ class Chat(cmd.Cog):
             )
 
             enabled_str = "will" if enabled else "will not"
-            await ctx.send(
+            await ctx.reply(
                 embed=discord.Embed(
                     title="Embed messages",
                     description=f"Message links sent in chat {enabled_str} embed.",
@@ -46,7 +46,7 @@ class Chat(cmd.Cog):
         )
 
         enabled_str = "will now" if enable else "will no longer"
-        await ctx.send(
+        await ctx.reply(
             embed=discord.Embed(
                 title="Embed messages",
                 description=f"Message links sent in chat {enabled_str} embed.",
@@ -61,7 +61,7 @@ class Chat(cmd.Cog):
         """Edits slowmode to a precise number of seconds"""
 
         if seconds > 21600:
-            await ctx.send(
+            await ctx.reply(
                 embed=discord.Embed(
                     title="Slowmode",
                     description=f"Slow mode cannot be longer than 21600 seconds.",
@@ -69,7 +69,7 @@ class Chat(cmd.Cog):
             )
             return
         if seconds < 0:
-            await ctx.send(
+            await ctx.reply(
                 embed=discord.Embed(
                     title="Slowmode",
                     description=f"Warping back in time is impossible.",
@@ -81,14 +81,14 @@ class Chat(cmd.Cog):
 
         if seconds > 0:
             second_plural = "second" if seconds == 1 else "seconds"
-            await ctx.send(
+            await ctx.reply(
                 embed=discord.Embed(
                     title="Slowmode",
                     description=f"Slow mode in this channel is now set to {seconds} {second_plural}.",
                 )
             )
         else:
-            await ctx.send(
+            await ctx.reply(
                 embed=discord.Embed(
                     title="Slowmode",
                     description=f"Slow mode in this channel is now disabled.",
@@ -100,7 +100,7 @@ class Chat(cmd.Cog):
     async def nick(self, ctx: cmd.Context):
         """Commands used to clean up member nicknames"""
 
-        await ctx.send_help("nick")
+        await ctx.reply_help("nick")
 
     @nick.command(name="clean")
     @commands.max_concurrency(1, commands.BucketType.guild)
@@ -132,7 +132,7 @@ class Chat(cmd.Cog):
                     await member.edit(nick=new_nick)
 
         plural_nickname = "nickname" if nicknames_changed == 1 else "nicknames"
-        await ctx.send(
+        await ctx.reply(
             embed=discord.Embed(
                 title="Nickname",
                 description=f"Successfully cleaned up {nicknames_changed} {plural_nickname}.",
@@ -167,7 +167,7 @@ class Chat(cmd.Cog):
                     await member.edit(nick=new_nick)
 
         plural_nickname = "nickname" if nicknames_changed == 1 else "nicknames"
-        await ctx.send(
+        await ctx.reply(
             embed=discord.Embed(
                 title="Nickname",
                 description=f"Successfully dehoisted {nicknames_changed} {plural_nickname}.",
@@ -202,7 +202,7 @@ class Chat(cmd.Cog):
                     await member.edit(nick=new_nick)
 
         plural_nickname = "nickname" if nicknames_changed == 1 else "nicknames"
-        await ctx.send(
+        await ctx.reply(
             embed=discord.Embed(
                 title="Nickname",
                 description=f"Successfully normalized {nicknames_changed} {plural_nickname}.",

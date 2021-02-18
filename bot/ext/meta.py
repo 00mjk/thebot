@@ -32,7 +32,7 @@ class Meta(cmd.Cog):
                 new_prefix,
             )
 
-            await ctx.send(
+            await ctx.reply(
                 embed=discord.Embed(
                     title="Prefix",
                     description=f"Prefix has been set to {wrap_in_code(new_prefix)}.",
@@ -54,7 +54,7 @@ class Meta(cmd.Cog):
             f"\nUse {get_command_signature(ctx, self.prefix)} to set it.",
         )
 
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed)
 
     @commands.command(aliases=["invite"])
     @commands.cooldown(3, 8, commands.BucketType.channel)
@@ -75,7 +75,7 @@ class Meta(cmd.Cog):
             inline=False,
         )
 
-        await ctx.send(embed=embed)
+        await ctx.reply(embed=embed)
 
 
 def setup(bot: commands.Bot):

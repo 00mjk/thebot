@@ -68,7 +68,7 @@ class Voice(cmd.Cog):
 
         text_perms = text_channel.permissions_for(ctx.guild.me)
         if not text_perms.view_channel or not text_perms.manage_roles:
-            await ctx.send(
+            await ctx.reply(
                 embed=discord.Embed(
                     title="Missing permissions",
                     description=f"I cannot manage roles in {text_channel.mention}.",
@@ -87,7 +87,7 @@ class Voice(cmd.Cog):
             read_messages=False,
         )
 
-        await ctx.send(
+        await ctx.reply(
             embed=discord.Embed(
                 title="Voice link created",
                 description=f"Members who connect to {wrap_in_code(voice_channel.name)} will now get access to {text_channel.mention}.",
@@ -117,7 +117,7 @@ class Voice(cmd.Cog):
         if isinstance(channel, discord.VoiceChannel):
             message = f"Members who connect to {wrap_in_code(channel.name)} will no longer get access to extra channels."
 
-        await ctx.send(
+        await ctx.reply(
             embed=discord.Embed(title="Voice link deleted", description=message)
         )
 

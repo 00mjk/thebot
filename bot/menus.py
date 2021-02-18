@@ -72,7 +72,7 @@ class FieldPaginator:
         return embed
 
     async def send(self, ctx: cmd.Context):
-        message = await ctx.send(embed=self.get_embed_for_page(0))
+        message = await ctx.reply(embed=self.get_embed_for_page(0))
 
         if len(self.pages) <= 1:
             return message
