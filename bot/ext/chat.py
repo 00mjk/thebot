@@ -100,7 +100,7 @@ class Chat(cmd.Cog):
     async def nick(self, ctx: cmd.Context):
         """Commands used to clean up member nicknames"""
 
-        await ctx.reply_help("nick")
+        await ctx.send_help("nick")
 
     @nick.command(name="clean")
     @commands.max_concurrency(1, commands.BucketType.guild)

@@ -125,7 +125,7 @@ class Emoji(cmd.Cog):
     async def emojilock(self, ctx: cmd.Context):
         """Locks certain emoji to given roles only"""
 
-        await ctx.reply_help("emojilock")
+        await ctx.send_help("emojilock")
 
     @emojilock.command(name="list")
     @commands.cooldown(3, 8, commands.BucketType.guild)

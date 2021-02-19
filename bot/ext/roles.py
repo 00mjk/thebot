@@ -61,7 +61,7 @@ class Roles(cmd.Cog):
     async def roleconfig(self, ctx: cmd.Context):
         """Manages selfroles setup for this server"""
 
-        await ctx.reply_help("roleconfig")
+        await ctx.send_help("roleconfig")
 
     @roleconfig.command(name="add")
     @commands.cooldown(3, 8, commands.BucketType.guild)
