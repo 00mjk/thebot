@@ -3,6 +3,7 @@ from os import environ
 
 import aiohttp
 import asyncpg
+import cachetools
 import discord
 from discord.ext import commands
 
@@ -62,17 +63,16 @@ class Bot(commands.AutoShardedBot):
         await self.pool.close()
         await super().close()
 
+    prefix_cache = cachetools.TTLCache(maxsize=float("inf"), ttl=900)
+
     async def get_prefix_list(self, bot, message):
         prefix = ";"
 
         if message.guild:
-            prefix = await self.pool.fetchval(
-                """
-                SELECT prefix FROM guild_config
-                WHERE guild_id = $1
-                """,
-                message.guild.id,
-            )
+            try:
+                prefix = self.prefix_cache[message.guild.id]
+            except KeyError:
+                pass
 
         return (
             f"<@!{bot.user.id}> ",
@@ -97,7 +97,7 @@ class Bot(commands.AutoShardedBot):
         if message.author.bot:
             return
 
-        if message.guild:
+        if message.guild and message.guild.id not in self.prefix_cache:
             await self.pool.execute(
                 """
                 INSERT INTO guild_config (guild_id) VALUES ($1)
@@ -112,13 +112,17 @@ class Bot(commands.AutoShardedBot):
             prefix = ";"
 
             if message.guild:
-                prefix = await self.pool.fetchval(
-                    """
-                    SELECT prefix FROM guild_config
-                    WHERE guild_id = $1
-                    """,
-                    message.guild.id,
-                )
+                try:
+                    prefix = self.prefix_cache[message.guild.id]
+                except KeyError:
+                    prefix = await self.pool.fetchval(
+                        """
+                        SELECT prefix FROM guild_config
+                        WHERE guild_id = $1
+                        """,
+                        message.guild.id,
+                    )
+                    self.prefix_cache[message.guild.id] = prefix
 
             await message.channel.send(
                 embed=discord.Embed(
