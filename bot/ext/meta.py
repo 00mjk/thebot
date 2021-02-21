@@ -32,6 +32,8 @@ class Meta(cmd.Cog):
                 new_prefix,
             )
 
+            ctx.bot.prefix_cache[ctx.guild.id] = new_prefix
+
             await ctx.reply(
                 embed=discord.Embed(
                     title="Prefix",
