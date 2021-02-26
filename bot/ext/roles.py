@@ -213,6 +213,15 @@ class Roles(cmd.Cog):
                 ctx.guild.id,
             )
 
+        if len(role_ids) == 0:
+            await ctx.reply(
+                embed=discord.Embed(
+                    title="Selfroles",
+                    description="There are no self-assignable roles in this server.",
+                )
+            )
+            return
+
         await ctx.reply(
             embed=discord.Embed(
                 title="Selfroles",
