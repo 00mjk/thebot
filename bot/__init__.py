@@ -70,7 +70,7 @@ class Bot(commands.AutoShardedBot):
             return ";"
 
         try:
-            prefix = self.prefix_cache[message.guild.id]
+            return self.prefix_cache[message.guild.id]
         except KeyError:
             prefix = await self.pool.fetchval(
                 """
@@ -80,6 +80,7 @@ class Bot(commands.AutoShardedBot):
                 message.guild.id,
             )
             self.prefix_cache[message.guild.id] = prefix
+            return prefix
 
     async def get_prefix_list(self, bot, message):
         prefix = await self.get_prefix(message)
