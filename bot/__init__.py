@@ -65,14 +65,24 @@ class Bot(commands.AutoShardedBot):
 
     prefix_cache = cachetools.TTLCache(maxsize=float("inf"), ttl=900)
 
-    async def get_prefix_list(self, bot, message):
-        prefix = ";"
+    async def get_prefix(self, message):
+        if not message.guild:
+            return ";"
 
-        if message.guild:
-            try:
-                prefix = self.prefix_cache[message.guild.id]
-            except KeyError:
-                pass
+        try:
+            prefix = self.prefix_cache[message.guild.id]
+        except KeyError:
+            prefix = await self.pool.fetchval(
+                """
+                SELECT prefix FROM guild_config
+                WHERE guild_id = $1
+                """,
+                message.guild.id,
+            )
+            self.prefix_cache[message.guild.id] = prefix
+
+    async def get_prefix_list(self, bot, message):
+        prefix = await self.get_prefix(message)
 
         return (
             f"<@!{bot.user.id}> ",
@@ -109,20 +119,7 @@ class Bot(commands.AutoShardedBot):
         ctx = await self.get_context(message, cls=cmd.Context)
 
         if re.fullmatch(rf"<@!?{self.user.id}>", message.content):
-            prefix = ";"
-
-            if message.guild:
-                try:
-                    prefix = self.prefix_cache[message.guild.id]
-                except KeyError:
-                    prefix = await self.pool.fetchval(
-                        """
-                        SELECT prefix FROM guild_config
-                        WHERE guild_id = $1
-                        """,
-                        message.guild.id,
-                    )
-                    self.prefix_cache[message.guild.id] = prefix
+            prefix = await self.get_prefix(message)
 
             await message.channel.send(
                 embed=discord.Embed(
