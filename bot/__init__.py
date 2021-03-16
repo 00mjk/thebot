@@ -65,7 +65,7 @@ class Bot(commands.AutoShardedBot):
 
     prefix_cache = cachetools.TTLCache(maxsize=float("inf"), ttl=900)
 
-    async def get_prefix(self, message):
+    async def get_prefix_for_message(self, message):
         if not message.guild:
             return ";"
 
@@ -83,7 +83,7 @@ class Bot(commands.AutoShardedBot):
             return prefix
 
     async def get_prefix_list(self, bot, message):
-        prefix = await self.get_prefix(message)
+        prefix = await self.get_prefix_for_message(message)
 
         return (
             f"<@!{bot.user.id}> ",
@@ -120,7 +120,7 @@ class Bot(commands.AutoShardedBot):
         ctx = await self.get_context(message, cls=cmd.Context)
 
         if re.fullmatch(rf"<@!?{self.user.id}>", message.content):
-            prefix = await self.get_prefix(message)
+            prefix = await self.get_prefix_for_message(message)
 
             await message.channel.send(
                 embed=discord.Embed(
