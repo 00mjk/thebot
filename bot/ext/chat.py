@@ -236,6 +236,12 @@ class Chat(cmd.Cog):
             ctx.guild.id,
         )
 
+        try:
+            _, normalize = self.auto_clean_cache[guild.id]
+            self.auto_clean_cache[guild.id] = enable, normalize
+        except KeyError:
+            pass
+
         enabled_str = "will now" if enable else "will no longer"
         await ctx.reply(
             embed=discord.Embed(
@@ -277,6 +283,12 @@ class Chat(cmd.Cog):
             enable,
             ctx.guild.id,
         )
+
+        try:
+            dehoist, _ = self.auto_clean_cache[guild.id]
+            self.auto_clean_cache[guild.id] = dehoist, enable
+        except KeyError:
+            pass
 
         enabled_str = "will now" if enable else "will no longer"
         await ctx.reply(
