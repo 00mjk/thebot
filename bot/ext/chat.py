@@ -358,11 +358,12 @@ class Chat(cmd.Cog):
     auto_clean_cache = cachetools.TTLCache(maxsize=float("inf"), ttl=900)
 
     @commands.Cog.listener()
-    async def on_socket_response(self, data: dict):
-        if data["op"] != gateway.DiscordWebSocket.DISPATCH:
+    async def on_socket_response(self, event: dict):
+        if event["op"] != gateway.DiscordWebSocket.DISPATCH:
             return
 
-        if data["t"] == "GUILD_MEMBER_UPDATE":
+        if event["t"] == "GUILD_MEMBER_UPDATE":
+            data = event["d"]
             guild = self.bot.get_guild(int(data["guild_id"]))
             user_id = int(data["user"]["id"])
 
