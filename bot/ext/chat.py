@@ -383,7 +383,7 @@ class Chat(cmd.Cog):
             try:
                 dehoist, normalize = self.auto_clean_cache[guild.id]
             except KeyError:
-                row = await ctx.bot.pool.fetchrow(
+                row = await self.bot.pool.fetchrow(
                     """
                     SELECT auto_clean_dehoist, auto_clean_normalize FROM guild_config
                     WHERE guild_id = $1
