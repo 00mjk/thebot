@@ -237,8 +237,8 @@ class Chat(cmd.Cog):
         )
 
         try:
-            _, normalize = self.auto_clean_cache[guild.id]
-            self.auto_clean_cache[guild.id] = enable, normalize
+            _, normalize = self.auto_clean_cache[ctx.guild.id]
+            self.auto_clean_cache[ctx.guild.id] = enable, normalize
         except KeyError:
             pass
 
@@ -285,8 +285,8 @@ class Chat(cmd.Cog):
         )
 
         try:
-            dehoist, _ = self.auto_clean_cache[guild.id]
-            self.auto_clean_cache[guild.id] = dehoist, enable
+            dehoist, _ = self.auto_clean_cache[ctx.guild.id]
+            self.auto_clean_cache[ctx.guild.id] = dehoist, enable
         except KeyError:
             pass
 
