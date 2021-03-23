@@ -132,7 +132,11 @@ class Chat(cmd.Cog):
 
         async with ctx.typing():
             async for member in ctx.guild.fetch_members(limit=None):
-                if member.bot:
+                if (
+                    member.bot
+                    or member == ctx.guild.owner
+                    or member.top_role >= ctx.guild.me.top_role
+                ):
                     continue
 
                 new_nick = self.clean_username(member.display_name)
@@ -159,7 +163,11 @@ class Chat(cmd.Cog):
 
         async with ctx.typing():
             async for member in ctx.guild.fetch_members(limit=None):
-                if member.bot:
+                if (
+                    member.bot
+                    or member == ctx.guild.owner
+                    or member.top_role >= ctx.guild.me.top_role
+                ):
                     continue
 
                 new_nick = self.clean_username(member.display_name, normalize=False)
@@ -186,7 +194,11 @@ class Chat(cmd.Cog):
 
         async with ctx.typing():
             async for member in ctx.guild.fetch_members(limit=None):
-                if member.bot:
+                if (
+                    member.bot
+                    or member == ctx.guild.owner
+                    or member.top_role >= ctx.guild.me.top_role
+                ):
                     continue
 
                 new_nick = self.clean_username(member.display_name, dehoist=False)
