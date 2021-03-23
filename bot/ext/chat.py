@@ -4,6 +4,7 @@ import unicodedata
 import discord
 from bot import cmd, converter
 from bot.utils import wrap_in_code
+from discord import gateway
 from discord.ext import commands
 from discord.utils import escape_markdown, get
 
@@ -95,6 +96,23 @@ class Chat(cmd.Cog):
                 )
             )
 
+    def clean_username(
+        self, text: str, *, normalize: bool = True, dehoist: bool = True
+    ):
+        if normalize:
+            text = unicodedata.normalize("NFKC", member.display_name)
+
+        ret = ""
+
+        for char in text:
+            if dehoist and not ret and ord(char) < ord("0"):
+                continue
+
+            if normalize and unicodedata.combining(char) == 0:
+                ret += char
+
+        return ret
+
     @commands.group(invoke_without_command=True)
     @commands.cooldown(3, 8, commands.BucketType.channel)
     async def nick(self, ctx: cmd.Context):
@@ -116,17 +134,7 @@ class Chat(cmd.Cog):
                 if member.bot:
                     continue
 
-                normalized = unicodedata.normalize("NFKC", member.display_name)
-                new_nick = ""
-                for char in normalized:
-                    if not new_nick and ord(char) < ord("0"):
-                        continue
-                    if unicodedata.combining(char) == 0:
-                        new_nick += char
-
-                if not new_nick:
-                    new_nick = "dehoisted"
-
+                new_nick = self.clean_username(member.display_name)
                 if member.display_name != new_nick:
                     nicknames_changed += 1
                     await member.edit(nick=new_nick)
@@ -153,15 +161,7 @@ class Chat(cmd.Cog):
                 if member.bot:
                     continue
 
-                new_nick = ""
-                for char in member.display_name:
-                    if not new_nick and ord(char) < ord("0"):
-                        continue
-                    new_nick += char
-
-                if not new_nick:
-                    new_nick = "dehoisted"
-
+                new_nick = self.clean_username(member.display_name, normalize=False)
                 if member.display_name != new_nick:
                     nicknames_changed += 1
                     await member.edit(nick=new_nick)
@@ -188,15 +188,7 @@ class Chat(cmd.Cog):
                 if member.bot:
                     continue
 
-                normalized = unicodedata.normalize("NFKC", member.display_name)
-                new_nick = ""
-                for char in normalized:
-                    if unicodedata.combining(char) == 0:
-                        new_nick += char
-
-                if not new_nick:
-                    new_nick = "bad name"
-
+                new_nick = self.clean_username(member.display_name, dehoist=False)
                 if member.display_name != new_nick:
                     nicknames_changed += 1
                     await member.edit(nick=new_nick)
@@ -206,6 +198,90 @@ class Chat(cmd.Cog):
             embed=discord.Embed(
                 title="Nickname",
                 description=f"Successfully normalized {nicknames_changed} {plural_nickname}.",
+            )
+        )
+
+    @nick.command(name="autodehoist")
+    @commands.cooldown(3, 8, commands.BucketType.guild)
+    @commands.has_guild_permissions(manage_messages=True)
+    async def nick_autodehoist(self, ctx: cmd.Context, enable: bool = None):
+        """Toggles whether or not I should embed message links"""
+
+        if enable is None:
+            enabled = await ctx.bot.pool.fetchval(
+                """
+                SELECT auto_clean_dehoist FROM guild_config
+                WHERE guild_id = $1
+                """,
+                ctx.guild.id,
+            )
+
+            enabled_str = "are" if enabled else "are not"
+            await ctx.reply(
+                embed=discord.Embed(
+                    title="Auto dehoist",
+                    description=f"Nicknames {enabled_str} dehoisted automatically.",
+                )
+            )
+            return
+
+        await ctx.bot.pool.execute(
+            """
+            UPDATE guild_config
+            SET auto_clean_dehoist = $1
+            WHERE guild_id = $2
+            """,
+            enable,
+            ctx.guild.id,
+        )
+
+        enabled_str = "will now" if enable else "will no longer"
+        await ctx.reply(
+            embed=discord.Embed(
+                title="Auto dehoist",
+                description=f"Nicknames {enabled_str} be dehoisted automatically.",
+            )
+        )
+
+    @nick.command(name="autonormalize", aliases=["autonormalise"])
+    @commands.cooldown(3, 8, commands.BucketType.guild)
+    @commands.has_guild_permissions(manage_messages=True)
+    async def nick_autonormalize(self, ctx: cmd.Context, enable: bool = None):
+        """Toggles whether or not I should embed message links"""
+
+        if enable is None:
+            enabled = await ctx.bot.pool.fetchval(
+                """
+                SELECT auto_clean_normalize FROM guild_config
+                WHERE guild_id = $1
+                """,
+                ctx.guild.id,
+            )
+
+            enabled_str = "are" if enabled else "are not"
+            await ctx.reply(
+                embed=discord.Embed(
+                    title="Auto normalize",
+                    description=f"Nicknames {enabled_str} normalized automatically.",
+                )
+            )
+            return
+
+        await ctx.bot.pool.execute(
+            """
+            UPDATE guild_config
+            SET auto_clean_normalize = $1
+            WHERE guild_id = $2
+            """,
+            enable,
+            ctx.guild.id,
+        )
+
+        enabled_str = "will now" if enable else "will no longer"
+        await ctx.reply(
+            embed=discord.Embed(
+                title="Auto normalize",
+                description=f"Nicknames {enabled_str} be normalized automatically.",
             )
         )
 
@@ -277,6 +353,57 @@ class Chat(cmd.Cog):
                 f"Aborted embedding {len(linked_messages) - 3} more {message_plural}.",
                 allowed_mentions=discord.AllowedMentions.none(),
             )
+
+    auto_clean_cache = cachetools.TTLCache(maxsize=float("inf"), ttl=900)
+
+    @commands.Cog.listener()
+    async def on_socket_response(self, data: dict):
+        if data["op"] != gateway.DiscordWebSocket.DISPATCH:
+            return
+
+        if event == "GUILD_MEMBER_UPDATE":
+            guild = self.bot.get_guild(int(data["guild_id"]))
+            user_id = int(data["user"]["id"])
+
+            if guild.owner_id == user_id or data["user"]["bot"]:
+                return
+            if not guild.me.guild_permissions.manage_nicknames:
+                return
+
+            target_top_role = max(
+                [guild.get_role(role_id) for role_id in data["roles"]]
+                or [guild.default_role]
+            )
+            if target_top_role >= guild.me.top_role:
+                return
+
+            dehoist, normalize = None, None
+            try:
+                dehoist, normalize = self.auto_clean_cache[guild.id]
+            except KeyError:
+                row = await ctx.bot.pool.fetchrow(
+                    """
+                    SELECT auto_clean_dehoist, auto_clean_normalize FROM guild_config
+                    WHERE guild_id = $1
+                    """,
+                    guild.id,
+                )
+                if not row:
+                    return
+
+                dehoist = row["auto_clean_dehoist"]
+                normalize = row["auto_clean_normalize"]
+                self.auto_clean_cache[guild.id] = dehoist, normalize
+
+            if not dehoist and not normalize:
+                return
+
+            member = await guild.fetch_member(user_id)
+            nick = self.clean_username(
+                member.display_name, normalize=normalize, dehoist=dehoist
+            )
+            if member.display_name != nick:
+                await member.edit(nick=nick)
 
 
 def setup(bot: commands.Bot):

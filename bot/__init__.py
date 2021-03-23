@@ -45,7 +45,6 @@ class Bot(commands.AutoShardedBot):
             ),
             member_cache_flags=discord.MemberCacheFlags.none(),
             max_messages=None,
-            guild_subscriptions=False,
         )
 
         self.add_check(self.global_check)
