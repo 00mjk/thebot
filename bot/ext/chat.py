@@ -381,6 +381,41 @@ class Chat(cmd.Cog):
 
     auto_clean_cache = cachetools.TTLCache(maxsize=float("inf"), ttl=900)
 
+    async def get_auto_clean_status(self, guild: discord.Guild):
+        try:
+            return self.auto_clean_cache[guild.id]
+        except KeyError:
+            row = await self.bot.pool.fetchrow(
+                """
+                SELECT auto_clean_dehoist, auto_clean_normalize FROM guild_config
+                WHERE guild_id = $1
+                """,
+                guild.id,
+            )
+            if not row:
+                return False, False
+
+            dehoist = row["auto_clean_dehoist"]
+            normalize = row["auto_clean_normalize"]
+            self.auto_clean_cache[guild.id] = dehoist, normalize
+
+            return self.get_auto_clean_status(guild)
+
+    @commands.Cog.listener()
+    async def on_member_join(self, member: discord.Member):
+        if member.bot or not member.guild.me.guild_permissions.manage_nicknames:
+            return
+
+        dehoist, normalize = await self.get_auto_clean_status(member.guild)
+        if not dehoist and not normalize:
+            return
+
+        nick = self.clean_username(
+            member.display_name, normalize=normalize, dehoist=dehoist
+        )
+        if member.display_name != nick:
+            await member.edit(nick=nick)
+
     @commands.Cog.listener()
     async def on_socket_response(self, event: dict):
         if event["op"] != gateway.DiscordWebSocket.DISPATCH:
@@ -403,24 +438,7 @@ class Chat(cmd.Cog):
             if target_top_role >= guild.me.top_role:
                 return
 
-            dehoist, normalize = None, None
-            try:
-                dehoist, normalize = self.auto_clean_cache[guild.id]
-            except KeyError:
-                row = await self.bot.pool.fetchrow(
-                    """
-                    SELECT auto_clean_dehoist, auto_clean_normalize FROM guild_config
-                    WHERE guild_id = $1
-                    """,
-                    guild.id,
-                )
-                if not row:
-                    return
-
-                dehoist = row["auto_clean_dehoist"]
-                normalize = row["auto_clean_normalize"]
-                self.auto_clean_cache[guild.id] = dehoist, normalize
-
+            dehoist, normalize = await self.get_auto_clean_status(guild)
             if not dehoist and not normalize:
                 return
 
