@@ -367,7 +367,7 @@ class Chat(cmd.Cog):
             guild = self.bot.get_guild(int(data["guild_id"]))
             user_id = int(data["user"]["id"])
 
-            if guild.owner_id == user_id or data["user"]["bot"]:
+            if guild.owner_id == user_id or data["user"].get("bot", False):
                 return
             if not guild.me.guild_permissions.manage_nicknames:
                 return
