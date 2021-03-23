@@ -1,6 +1,7 @@
 import re
 import unicodedata
 
+import cachetools
 import discord
 from bot import cmd, converter
 from bot.utils import wrap_in_code
