@@ -362,7 +362,7 @@ class Chat(cmd.Cog):
         if data["op"] != gateway.DiscordWebSocket.DISPATCH:
             return
 
-        if event == "GUILD_MEMBER_UPDATE":
+        if data["t"] == "GUILD_MEMBER_UPDATE":
             guild = self.bot.get_guild(int(data["guild_id"]))
             user_id = int(data["user"]["id"])
 
