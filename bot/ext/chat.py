@@ -101,7 +101,7 @@ class Chat(cmd.Cog):
         self, text: str, *, normalize: bool = True, dehoist: bool = True
     ):
         if normalize:
-            text = unicodedata.normalize("NFKC", member.display_name)
+            text = unicodedata.normalize("NFKC", text)
 
         ret = ""
 
