@@ -373,7 +373,7 @@ class Chat(cmd.Cog):
                 return
 
             target_top_role = max(
-                [guild.get_role(role_id) for role_id in data["roles"]]
+                [guild.get_role(int(role_id)) for role_id in data["roles"]]
                 or [guild.default_role]
             )
             if target_top_role >= guild.me.top_role:
