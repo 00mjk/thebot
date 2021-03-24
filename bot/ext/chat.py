@@ -399,7 +399,7 @@ class Chat(cmd.Cog):
             normalize = row["auto_clean_normalize"]
             self.auto_clean_cache[guild.id] = dehoist, normalize
 
-            return self.get_auto_clean_status(guild)
+            return await self.get_auto_clean_status(guild)
 
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
