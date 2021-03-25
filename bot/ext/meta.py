@@ -68,7 +68,7 @@ class Meta(cmd.Cog):
         embed = discord.Embed(title="About", description=self.bot.description)
         embed.add_field(
             name="Invite Link",
-            value=f"https://discord.com/api/oauth2/authorize?client_id={app_info.id}&permissions=51200&scope=bot",
+            value=f"https://discord.com/api/oauth2/authorize?client_id={app_info.id}&permissions=51200&scope=bot+applications.commands",
             inline=False,
         )
         embed.add_field(
