@@ -109,7 +109,7 @@ class Chat(cmd.Cog):
             if dehoist and not ret and ord(char) < ord("0"):
                 continue
 
-            if normalize and unicodedata.combining(char) == 0:
+            if not normalize or unicodedata.combining(char) == 0:
                 ret += char
 
         return ret
