@@ -409,12 +409,14 @@ class Chat(cmd.Cog):
         except KeyError:
             nicks = await self.bot.pool.fetch(
                 """
-                SELECT member_id FROM cleaned_username
+                SELECT member_id, nick FROM cleaned_username
                 WHERE guild_id = $1
                 """,
                 guild.id,
             )
-            self.cleaned_usernames_cache[guild.id] = {row["member_id"] for row in nicks}
+            self.cleaned_usernames_cache[guild.id] = {
+                row["member_id"]: row["nick"] for row in nicks
+            }
             return await self.get_cleaned_usernames(guild)
 
     @commands.Cog.listener()
@@ -432,20 +434,23 @@ class Chat(cmd.Cog):
         new_nick = self.clean_display_name(
             member.display_name, normalize=normalize, dehoist=dehoist
         )
+        if not new_nick:
+            new_nick = "[cleaned]"
         if member.display_name != new_nick:
-            await member.edit(nick=new_nick or "[cleaned]")
+            await member.edit(nick=new_nick)
 
             if mark_as_managed:
                 nicks = await self.get_cleaned_usernames(member.guild)
-                nicks.add(member.id)
+                nicks[member.id] = new_nick
                 await self.bot.pool.execute(
                     """
-                    INSERT INTO cleaned_username (guild_id, member_id)
-                    VALUES ($1, $2)
+                    INSERT INTO cleaned_username (guild_id, member_id, nick)
+                    VALUES ($1, $2, $3)
                     ON CONFLICT DO NOTHING
                     """,
                     member.guild.id,
                     member.id,
+                    new_nick,
                 )
 
     @commands.Cog.listener()
@@ -456,7 +461,6 @@ class Chat(cmd.Cog):
         if event["t"] == "GUILD_MEMBER_UPDATE":
             data = event["d"]
             guild = self.bot.get_guild(int(data["guild_id"]))
-
             user_id = int(data["user"]["id"])
 
             if guild.owner_id == user_id or data["user"].get("bot", False):
@@ -476,38 +480,41 @@ class Chat(cmd.Cog):
                 return
 
             nicks = await self.get_cleaned_usernames(guild)
+            member = await guild.fetch_member(user_id)
 
             new_nick = None
             db_action = None
 
-            if data.get("nick"):
+            if not member.nick or member.nick == nicks.get(member.id):
+                db_action = True
                 new_nick = self.clean_display_name(
-                    data["nick"], normalize=normalize, dehoist=dehoist
+                    member.name, normalize=normalize, dehoist=dehoist
                 )
-                db_action = False
-
-            elif "nick" in data or user_id in nicks:
-                new_nick = self.clean_display_name(
-                    data["user"]["username"], normalize=normalize, dehoist=dehoist
-                )
-                db_action = new_nick != data["user"]["username"]
 
             else:
-                return
+                db_action = False
+                new_nick = self.clean_display_name(
+                    member.nick, normalize=normalize, dehoist=dehoist
+                )
 
-            if db_action:
-                nicks.add(user_id)
+            if not new_nick:
+                new_nick = "[cleaned]"
+
+            if db_action and nicks.get(user_id) != member.nick:
+                nicks[user_id] = new_nick
                 await self.bot.pool.execute(
                     """
-                    INSERT INTO cleaned_username (guild_id, member_id)
-                    VALUES ($1, $2)
-                    ON CONFLICT DO NOTHING
+                    INSERT INTO cleaned_username (guild_id, member_id, nick)
+                    VALUES ($1, $2, $3)
+                    ON CONFLICT (guild_id, member_id) DO UPDATE
+                    SET nick = $3
                     """,
                     guild.id,
                     user_id,
+                    new_nick,
                 )
-            elif not db_action:
-                nicks.discard(user_id)
+            elif not db_action and user_id in nicks:
+                nicks.pop(user_id, None)
                 await self.bot.pool.execute(
                     """
                     DELETE FROM cleaned_username
@@ -517,9 +524,8 @@ class Chat(cmd.Cog):
                     user_id,
                 )
 
-            member = await guild.fetch_member(user_id)
             if new_nick != member.display_name:
-                await member.edit(nick=new_nick or "[cleaned]")
+                await member.edit(nick=new_nick)
 
 
 def setup(bot: commands.Bot):
