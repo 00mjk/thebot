@@ -488,7 +488,7 @@ class Chat(cmd.Cog):
                 if member.nick == nicks.get(member.id)
                 else member.display_name
             )
-            new_nick_is_username = member.name == display_name
+            is_username = member.name == display_name
 
             new_nick = self.clean_display_name(
                 display_name, normalize=normalize, dehoist=dehoist
@@ -496,7 +496,17 @@ class Chat(cmd.Cog):
             if not new_nick:
                 new_nick = "[cleaned]"
 
-            if new_nick_is_username and nicks.get(user_id) != new_nick:
+            if not is_username or new_nick == display_name and user_id in nicks:
+                nicks.pop(user_id, None)
+                await self.bot.pool.execute(
+                    """
+                    DELETE FROM cleaned_username
+                    WHERE guild_id = $1 AND member_id = $2
+                    """,
+                    guild.id,
+                    user_id,
+                )
+            elif is_username and nicks.get(user_id) != new_nick:
                 nicks[user_id] = new_nick
                 await self.bot.pool.execute(
                     """
@@ -508,16 +518,6 @@ class Chat(cmd.Cog):
                     guild.id,
                     user_id,
                     new_nick,
-                )
-            elif not new_nick_is_username and user_id in nicks:
-                nicks.pop(user_id, None)
-                await self.bot.pool.execute(
-                    """
-                    DELETE FROM cleaned_username
-                    WHERE guild_id = $1 AND member_id = $2
-                    """,
-                    guild.id,
-                    user_id,
                 )
 
             if new_nick != member.display_name:
