@@ -495,7 +495,7 @@ class Chat(cmd.Cog):
             if not new_nick:
                 new_nick = "[cleaned]"
 
-            if new_nick_is_username and nicks.get(user_id) != member.nick:
+            if new_nick_is_username and nicks.get(user_id) != new_nick:
                 nicks[user_id] = new_nick
                 await self.bot.pool.execute(
                     """
