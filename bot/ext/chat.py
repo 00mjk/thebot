@@ -508,7 +508,7 @@ class Chat(cmd.Cog):
                     user_id,
                     new_nick,
                 )
-            elif not new_nick_is_username and user_id not in nicks:
+            elif not new_nick_is_username:
                 nicks.pop(user_id, None)
                 await self.bot.pool.execute(
                     """
