@@ -458,8 +458,9 @@ class Chat(cmd.Cog):
         if event["op"] != gateway.DiscordWebSocket.DISPATCH:
             return
 
+        data = event["d"]
+
         if event["t"] == "GUILD_MEMBER_UPDATE":
-            data = event["d"]
             guild = self.bot.get_guild(int(data["guild_id"]))
             user_id = int(data["user"]["id"])
 
@@ -521,6 +522,23 @@ class Chat(cmd.Cog):
 
             if new_nick != member.display_name:
                 await member.edit(nick=new_nick)
+
+        if event["t"] == "GUILD_MEMBER_REMOVE":
+            guild = self.bot.get_guild(int(data["guild_id"]))
+            user_id = int(data["user"]["id"])
+
+            nicks = await self.get_cleaned_usernames(guild)
+
+            if user_id in nicks:
+                nicks.pop(user_id, None)
+                await self.bot.pool.execute(
+                    """
+                    DELETE FROM cleaned_username
+                    WHERE guild_id = $1 AND member_id = $2
+                    """,
+                    guild.id,
+                    user_id,
+                )
 
 
 def setup(bot: commands.Bot):
