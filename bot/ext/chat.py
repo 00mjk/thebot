@@ -433,7 +433,7 @@ class Chat(cmd.Cog):
             member.display_name, normalize=normalize, dehoist=dehoist
         )
         if member.display_name != new_nick:
-            await member.edit(nick=nick or "[cleaned]")
+            await member.edit(nick=new_nick or "[cleaned]")
 
             if mark_as_managed:
                 nicks = await self.get_cleaned_usernames(member.guild)
@@ -495,7 +495,7 @@ class Chat(cmd.Cog):
             else:
                 return
 
-            if db_action and user_id not in nicks:
+            if db_action:
                 nicks.add(user_id)
                 await self.bot.pool.execute(
                     """
@@ -506,8 +506,8 @@ class Chat(cmd.Cog):
                     guild.id,
                     user_id,
                 )
-            elif not db_action and user_id in nicks:
-                nicks.remove(user_id)
+            elif not db_action:
+                nicks.discard(user_id)
                 await self.bot.pool.execute(
                     """
                     DELETE FROM cleaned_username
