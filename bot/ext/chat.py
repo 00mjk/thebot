@@ -142,7 +142,7 @@ class Chat(cmd.Cog):
                 new_nick = self.clean_display_name(member.display_name)
                 if member.display_name != new_nick:
                     nicknames_changed += 1
-                    await member.edit(nick=new_nick)
+                    await member.edit(nick=new_nick or "[cleaned]")
 
         plural_nickname = "nickname" if nicknames_changed == 1 else "nicknames"
         await ctx.reply(
@@ -173,7 +173,7 @@ class Chat(cmd.Cog):
                 new_nick = self.clean_display_name(member.display_name, normalize=False)
                 if member.display_name != new_nick:
                     nicknames_changed += 1
-                    await member.edit(nick=new_nick)
+                    await member.edit(nick=new_nick or "[cleaned]")
 
         plural_nickname = "nickname" if nicknames_changed == 1 else "nicknames"
         await ctx.reply(
@@ -204,7 +204,7 @@ class Chat(cmd.Cog):
                 new_nick = self.clean_display_name(member.display_name, dehoist=False)
                 if member.display_name != new_nick:
                     nicknames_changed += 1
-                    await member.edit(nick=new_nick)
+                    await member.edit(nick=new_nick or "[cleaned]")
 
         plural_nickname = "nickname" if nicknames_changed == 1 else "nicknames"
         await ctx.reply(
@@ -433,7 +433,7 @@ class Chat(cmd.Cog):
             member.display_name, normalize=normalize, dehoist=dehoist
         )
         if member.display_name != new_nick:
-            await member.edit(nick=nick)
+            await member.edit(nick=nick or "[cleaned]")
 
             if mark_as_managed:
                 nicks = await self.get_cleaned_usernames(member.guild)
@@ -519,7 +519,7 @@ class Chat(cmd.Cog):
 
             member = await guild.fetch_member(user_id)
             if new_nick != member.display_name:
-                await member.edit(nick=new_nick or "[cleaned: nick unreadable]")
+                await member.edit(nick=new_nick or "[cleaned]")
 
 
 def setup(bot: commands.Bot):
