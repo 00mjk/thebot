@@ -97,7 +97,7 @@ class Chat(cmd.Cog):
                 )
             )
 
-    def clean_username(
+    def clean_display_name(
         self, text: str, *, normalize: bool = True, dehoist: bool = True
     ):
         if normalize:
@@ -139,7 +139,7 @@ class Chat(cmd.Cog):
                 ):
                     continue
 
-                new_nick = self.clean_username(member.display_name)
+                new_nick = self.clean_display_name(member.display_name)
                 if member.display_name != new_nick:
                     nicknames_changed += 1
                     await member.edit(nick=new_nick)
@@ -170,7 +170,7 @@ class Chat(cmd.Cog):
                 ):
                     continue
 
-                new_nick = self.clean_username(member.display_name, normalize=False)
+                new_nick = self.clean_display_name(member.display_name, normalize=False)
                 if member.display_name != new_nick:
                     nicknames_changed += 1
                     await member.edit(nick=new_nick)
@@ -201,7 +201,7 @@ class Chat(cmd.Cog):
                 ):
                     continue
 
-                new_nick = self.clean_username(member.display_name, dehoist=False)
+                new_nick = self.clean_display_name(member.display_name, dehoist=False)
                 if member.display_name != new_nick:
                     nicknames_changed += 1
                     await member.edit(nick=new_nick)
@@ -401,6 +401,22 @@ class Chat(cmd.Cog):
 
             return await self.get_auto_clean_status(guild)
 
+    cleaned_usernames_cache = cachetools.TTLCache(maxsize=float("inf"), ttl=900)
+
+    async def get_cleaned_usernames(self, guild: discord.Guild):
+        try:
+            return self.cleaned_usernames_cache[guild.id]
+        except KeyError:
+            nicks = await self.bot.pool.fetch(
+                """
+                SELECT member_id FROM cleaned_username
+                WHERE guild_id = $1
+                """,
+                guild.id,
+            )
+            self.cleaned_usernames_cache[guild.id] = {row["member_id"] for row in nicks}
+            return await self.get_cleaned_usernames(guild)
+
     @commands.Cog.listener()
     async def on_member_join(self, member: discord.Member):
         if member.bot or not member.guild.me.guild_permissions.manage_nicknames:
@@ -410,11 +426,27 @@ class Chat(cmd.Cog):
         if not dehoist and not normalize:
             return
 
-        nick = self.clean_username(
+        # OAuth2 apps can add members with a nick
+        mark_as_managed = not member.nick
+
+        new_nick = self.clean_display_name(
             member.display_name, normalize=normalize, dehoist=dehoist
         )
-        if member.display_name != nick:
+        if member.display_name != new_nick:
             await member.edit(nick=nick)
+
+            if mark_as_managed:
+                nicks = await self.get_cleaned_usernames(member.guild)
+                nicks.add(member.id)
+                await self.bot.pool.execute(
+                    """
+                    INSERT INTO cleaned_username (guild_id, member_id)
+                    VALUES ($1, $2)
+                    ON CONFLICT DO NOTHING
+                    """,
+                    member.guild.id,
+                    member.id,
+                )
 
     @commands.Cog.listener()
     async def on_socket_response(self, event: dict):
@@ -424,6 +456,7 @@ class Chat(cmd.Cog):
         if event["t"] == "GUILD_MEMBER_UPDATE":
             data = event["d"]
             guild = self.bot.get_guild(int(data["guild_id"]))
+
             user_id = int(data["user"]["id"])
 
             if guild.owner_id == user_id or data["user"].get("bot", False):
@@ -432,8 +465,8 @@ class Chat(cmd.Cog):
                 return
 
             target_top_role = max(
-                [guild.get_role(int(role_id)) for role_id in data["roles"]]
-                or [guild.default_role]
+                (guild.get_role(int(role_id)) for role_id in data["roles"]),
+                default=guild.default_role,
             )
             if target_top_role >= guild.me.top_role:
                 return
@@ -442,12 +475,51 @@ class Chat(cmd.Cog):
             if not dehoist and not normalize:
                 return
 
+            nicks = await self.get_cleaned_usernames(guild)
+
+            new_nick = None
+            db_action = None
+
+            if data.get("nick"):
+                new_nick = self.clean_display_name(
+                    data["nick"], normalize=normalize, dehoist=dehoist
+                )
+                db_action = False
+
+            elif "nick" in data or user_id in nicks:
+                new_nick = self.clean_display_name(
+                    data["user"]["username"], normalize=normalize, dehoist=dehoist
+                )
+                db_action = new_nick != data["user"]["username"]
+
+            else:
+                return
+
+            if db_action and user_id not in nicks:
+                nicks.add(user_id)
+                await self.bot.pool.execute(
+                    """
+                    INSERT INTO cleaned_username (guild_id, member_id)
+                    VALUES ($1, $2)
+                    ON CONFLICT DO NOTHING
+                    """,
+                    guild.id,
+                    user_id,
+                )
+            elif not db_action and user_id in nicks:
+                nicks.remove(user_id)
+                await self.bot.pool.execute(
+                    """
+                    DELETE FROM cleaned_username
+                    WHERE guild_id = $1 AND member_id = $2
+                    """,
+                    guild.id,
+                    user_id,
+                )
+
             member = await guild.fetch_member(user_id)
-            nick = self.clean_username(
-                member.display_name, normalize=normalize, dehoist=dehoist
-            )
-            if member.display_name != nick:
-                await member.edit(nick=nick)
+            if new_nick != member.display_name:
+                await member.edit(nick=new_nick or "[cleaned: nick unreadable]")
 
 
 def setup(bot: commands.Bot):
