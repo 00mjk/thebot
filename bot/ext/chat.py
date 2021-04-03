@@ -142,7 +142,7 @@ class Chat(cmd.Cog):
                 new_nick = self.clean_display_name(member.display_name)
                 if member.display_name != new_nick:
                     nicknames_changed += 1
-                    await member.edit(nick=new_nick or "[cleaned]")
+                    await member.edit(nick=new_nick or "{cleaned}")
 
         plural_nickname = "nickname" if nicknames_changed == 1 else "nicknames"
         await ctx.reply(
@@ -173,7 +173,7 @@ class Chat(cmd.Cog):
                 new_nick = self.clean_display_name(member.display_name, normalize=False)
                 if member.display_name != new_nick:
                     nicknames_changed += 1
-                    await member.edit(nick=new_nick or "[cleaned]")
+                    await member.edit(nick=new_nick or "{cleaned}")
 
         plural_nickname = "nickname" if nicknames_changed == 1 else "nicknames"
         await ctx.reply(
@@ -204,7 +204,7 @@ class Chat(cmd.Cog):
                 new_nick = self.clean_display_name(member.display_name, dehoist=False)
                 if member.display_name != new_nick:
                     nicknames_changed += 1
-                    await member.edit(nick=new_nick or "[cleaned]")
+                    await member.edit(nick=new_nick or "{cleaned}")
 
         plural_nickname = "nickname" if nicknames_changed == 1 else "nicknames"
         await ctx.reply(
@@ -435,7 +435,7 @@ class Chat(cmd.Cog):
             member.display_name, normalize=normalize, dehoist=dehoist
         )
         if not new_nick:
-            new_nick = "[cleaned]"
+            new_nick = "{cleaned}"
         if member.display_name != new_nick:
             await member.edit(nick=new_nick)
 
@@ -494,7 +494,7 @@ class Chat(cmd.Cog):
                 display_name, normalize=normalize, dehoist=dehoist
             )
             if not new_nick:
-                new_nick = "[cleaned]"
+                new_nick = "{cleaned}"
 
             if not is_username or new_nick == display_name and user_id in nicks:
                 nicks.pop(user_id, None)
