@@ -67,15 +67,18 @@ class Emoji(cmd.Cog):
                 )
                 return
 
-            animated, name, emoji_id = matches.pop()
+            animated, emoji_name, emoji_id = matches.pop()
             emoji = discord.PartialEmoji.with_state(
                 ctx.bot._connection,
                 animated=bool(animated),
-                name=name,
+                name=emoji_name,
                 id=int(emoji_id),
             )
 
-        if len(ctx.guild.emojis) >= ctx.guild.emoji_limit:
+        if (
+            len(e for e in ctx.guild.emojis if e.animated == emoji.animated)
+            >= ctx.guild.emoji_limit
+        ):
             emoji_type = "animated emojis" if emoji.animated else "emojis"
 
             await ctx.reply(
@@ -86,7 +89,7 @@ class Emoji(cmd.Cog):
             )
             return
 
-        if not self.emoji_name_re.fullmatch(name):
+        if name and not self.emoji_name_re.fullmatch(name):
             await ctx.reply(
                 embed=discord.Embed(
                     title="Emoji name invalid",
