@@ -76,7 +76,7 @@ class Emoji(cmd.Cog):
             )
 
         if (
-            len(e for e in ctx.guild.emojis if e.animated == emoji.animated)
+            sum(1 for e in ctx.guild.emojis if e.animated == emoji.animated)
             >= ctx.guild.emoji_limit
         ):
             emoji_type = "animated emojis" if emoji.animated else "emojis"
