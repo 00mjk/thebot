@@ -134,32 +134,35 @@ class Voice(cmd.Cog):
         if before.channel == after.channel:
             return
 
-        before_text_channel_id = await self.bot.pool.fetchval(
+        before_text_channel_ids = await self.bot.pool.fetch(
             """
             SELECT text_channel_id FROM voice_link
             WHERE voice_channel_id = $1
             """,
             before.channel.id if before.channel else 0,
         )
-        before_text_channel = get(member.guild.channels, id=before_text_channel_id)
+        before_text_channels = {
+            get(member.guild.channels, id=channel_id)
+            for (channel_id,) in before_text_channel_ids
+        }
 
-        after_text_channel_id = await self.bot.pool.fetchval(
+        after_text_channel_ids = await self.bot.pool.fetch(
             """
             SELECT text_channel_id FROM voice_link
             WHERE voice_channel_id = $1
             """,
             after.channel.id if after.channel else 0,
         )
-        after_text_channel = get(member.guild.channels, id=after_text_channel_id)
+        after_text_channels = {
+            get(member.guild.channels, id=channel_id)
+            for (channel_id,) in after_text_channel_ids
+        }
 
-        if before_text_channel == after_text_channel:
-            return
+        for channel in before_text_channels - after_text_channels:
+            await patch_overwrites(channel, member, read_messages=None)
 
-        if before_text_channel:
-            await patch_overwrites(before_text_channel, member, read_messages=None)
-
-        if after_text_channel:
-            await patch_overwrites(after_text_channel, member, read_messages=True)
+        for channel in after_text_channels - before_text_channels:
+            await patch_overwrites(channel, member, read_messages=True)
 
 
 def setup(bot: commands.Bot):
