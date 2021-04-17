@@ -423,7 +423,7 @@ class Roles(cmd.Cog):
             role.id if role else None,
         )
 
-        self.autorole_cache[ctx.guild.id] = role.id
+        self.autorole_cache[ctx.guild.id] = role.id if role else None
 
         await ctx.reply(
             embed=discord.Embed(
