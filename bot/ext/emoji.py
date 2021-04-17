@@ -4,7 +4,6 @@ import typing
 import discord
 from bot import cmd, converter
 from discord.ext import commands
-from discord.utils import escape_markdown, get
 
 
 class Emoji(cmd.Cog):

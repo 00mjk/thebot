@@ -4,10 +4,9 @@ import unicodedata
 import cachetools
 import discord
 from bot import cmd, converter
-from bot.utils import wrap_in_code
 from discord import gateway
 from discord.ext import commands
-from discord.utils import escape_markdown, get
+from discord.utils import escape_markdown
 
 
 class Chat(cmd.Cog):
