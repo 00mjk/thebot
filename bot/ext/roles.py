@@ -399,7 +399,7 @@ class Roles(cmd.Cog):
         except KeyError:
             self.autorole_cache[guild.id] = await self.bot.pool.fetchval(
                 """
-                SELECT autorole FROM guild_config
+                SELECT autorole_id FROM guild_config
                 WHERE guild_id = $1
                 """,
                 guild.id,
@@ -416,7 +416,7 @@ class Roles(cmd.Cog):
         await ctx.bot.pool.execute(
             """
             UPDATE guild_config
-            SET autorole = $2
+            SET autorole_id = $2
             WHERE guild_id = $1
             """,
             ctx.guild.id,
@@ -455,7 +455,7 @@ class Roles(cmd.Cog):
                     await self.bot.pool.execute(
                         """
                         UPDATE guild_config
-                        SET autorole = NULL
+                        SET autorole_id = NULL
                         WHERE guild_id = $1
                         """,
                         guild.id,
