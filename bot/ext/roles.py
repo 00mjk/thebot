@@ -1,6 +1,8 @@
+import cachetools
 import discord
 from bot import cmd
 from bot.utils import get_command_signature, wrap_in_code
+from discord import gateway
 from discord.ext import commands
 from discord.utils import get
 
@@ -388,6 +390,76 @@ class Roles(cmd.Cog):
         )
 
         await ctx.reply(embed=embed)
+
+    autorole_cache = cachetools.TTLCache(maxsize=float("inf"), ttl=900)
+
+    async def get_autorole(self, guild: discord.Guild):
+        try:
+            return self.autorole_cache[guild.id]
+        except KeyError:
+            self.autorole_cache[guild.id] = await self.bot.pool.fetchval(
+                """
+                SELECT autorole FROM guild_config
+                WHERE guild_id = $1
+                """,
+                guild.id,
+            )
+
+            return await self.get_autorole(guild)
+
+    @commands.command()
+    @commands.cooldown(3, 8, commands.BucketType.guild)
+    @commands.has_guild_permissions(manage_roles=True)
+    async def autorole(self, ctx: cmd.Context, *, role: discord.Role = None):
+        """Configures an autorole for this server"""
+
+        await ctx.bot.pool.execute(
+            """
+            UPDATE guild_config
+            SET autorole = $2
+            WHERE guild_id = $1
+            """,
+            ctx.guild.id,
+            role.id if role else None,
+        )
+
+        self.autorole_cache[ctx.guild.id] = role.id
+
+        await ctx.reply(
+            embed=discord.Embed(
+                title="Autorole",
+                description=f"{role.mention} is now automatically assigned on join."
+                if role
+                else "Autorole is now disabled.",
+            )
+        )
+
+    @commands.Cog.listener()
+    async def on_socket_response(self, event: dict):
+        if event["op"] != gateway.DiscordWebSocket.DISPATCH:
+            return
+
+        data = event["d"]
+
+        if event["t"] in {"GUILD_MEMBER_ADD", "GUILD_MEMBER_UPDATE"}:
+            guild = self.bot.get_guild(int(data["guild_id"]))
+            role_id = await self.get_autorole(guild)
+            role = guild.get_role(role_id)
+
+            if not data.get("pending", True) and str(role_id) not in data["roles"]:
+                member = await guild.fetch_member(int(data["user"]["id"]))
+
+                if member and role:
+                    await member.add_roles(role)
+                elif not role:
+                    await self.bot.pool.execute(
+                        """
+                        UPDATE guild_config
+                        SET autorole = NULL
+                        WHERE guild_id = $1
+                        """,
+                        guild.id,
+                    )
 
     @commands.command()
     @commands.cooldown(1, 60, commands.BucketType.guild)
