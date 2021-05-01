@@ -312,6 +312,7 @@ class Chat(cmd.Cog):
     message_link_re = re.compile(
         r"https?://(?:(ptb|canary|www)\.)?discord(?:app)?\.com/channels/\d+/\d+/\d+"
     )
+    IMAGE_CONTENT_TYPES = {"image/png", "image/jpeg", "image/gif", "image/webp"}
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -356,15 +357,18 @@ class Chat(cmd.Cog):
             embed.set_author(name=str(author), icon_url=str(author.avatar_url))
             embed.set_footer(text=f"Sent in #{linked_message.channel.name}")
 
-            if len(linked_message.attachments) > 0:
-                attachment = linked_message.attachments[0]
-                if not attachment.height or attachment.is_spoiler():
+            for attachment in linked_message.attachments:
+                if (
+                    attachment.content_type in self.IMAGE_CONTENT_TYPES
+                    and not attachment.is_spoiler()
+                    and not embed.image
+                ):
+                    embed.set_image(url=attachment.url)
+                elif len(embed.fields) < 25:
                     embed.add_field(
                         name="File",
                         value=f"[{escape_markdown(attachment.filename)}]({attachment.url})",
                     )
-                else:
-                    embed.set_image(url=linked_message.attachments[0].url)
 
             await message.reply(
                 embed=embed,
