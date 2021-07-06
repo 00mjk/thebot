@@ -299,11 +299,9 @@ class Roles(cmd.Cog):
             )
             return
 
-        role = get(
-            ctx.guild.roles,
-            name=selected_pronoun,
-            permissions=discord.Permissions.none(),
-        )
+        role = get(ctx.guild.roles, name=selected_pronoun)
+        if role.permissions != discord.Permissions.none():
+            await role.edit(permissions=discord.Permissions.none())
 
         if not role:
             role = await ctx.guild.create_role(name=selected_pronoun)
