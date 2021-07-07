@@ -440,7 +440,7 @@ class Roles(cmd.Cog):
         data = event["d"]
 
         if event["t"] in {"GUILD_MEMBER_ADD", "GUILD_MEMBER_UPDATE"}:
-            if data["user"]["bot"]:
+            if data["user"].get("bot", False):
                 return
 
             guild = self.bot.get_guild(int(data["guild_id"]))

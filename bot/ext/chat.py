@@ -464,13 +464,13 @@ class Chat(cmd.Cog):
         data = event["d"]
 
         if event["t"] == "GUILD_MEMBER_UPDATE":
-            if data["user"]["bot"]:
+            if data["user"].get("bot", False):
                 return
 
             guild = self.bot.get_guild(int(data["guild_id"]))
             user_id = int(data["user"]["id"])
 
-            if guild.owner_id == user_id or data["user"].get("bot", False):
+            if guild.owner_id == user_id:
                 return
             if not guild.me.guild_permissions.manage_nicknames:
                 return
@@ -530,7 +530,7 @@ class Chat(cmd.Cog):
                 await member.edit(nick=new_nick)
 
         if event["t"] == "GUILD_MEMBER_REMOVE":
-            if data["user"]["bot"]:
+            if data["user"].get("bot", False):
                 return
 
             guild = self.bot.get_guild(int(data["guild_id"]))
