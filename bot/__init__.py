@@ -78,8 +78,8 @@ class Bot(commands.AutoShardedBot):
                 """,
                 message.guild.id,
             )
-            self.prefix_cache[message.guild.id] = prefix
-            return prefix
+            self.prefix_cache[message.guild.id] = prefix or ";"
+            return await self.get_prefix_for_message(message)
 
     async def get_prefix_list(self, bot, message):
         prefix = await self.get_prefix_for_message(message)

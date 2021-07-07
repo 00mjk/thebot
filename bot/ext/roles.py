@@ -440,15 +440,23 @@ class Roles(cmd.Cog):
         data = event["d"]
 
         if event["t"] in {"GUILD_MEMBER_ADD", "GUILD_MEMBER_UPDATE"}:
+            if data["user"]["bot"]:
+                return
+
             guild = self.bot.get_guild(int(data["guild_id"]))
             role_id = await self.get_autorole(guild)
             role = guild.get_role(role_id)
 
             if not data.get("pending", True) and str(role_id) not in data["roles"]:
-                member = await guild.fetch_member(int(data["user"]["id"]))
+                member = None
+                try:
+                    member = await guild.fetch_member(int(data["user"]["id"]))
+                except discord.NotFound:
+                    pass
 
                 if member and role:
-                    await member.add_roles(role)
+                    if guild.me.top_role > role:
+                        await member.add_roles(role)
                 elif not role:
                     await self.bot.pool.execute(
                         """

@@ -464,6 +464,9 @@ class Chat(cmd.Cog):
         data = event["d"]
 
         if event["t"] == "GUILD_MEMBER_UPDATE":
+            if data["user"]["bot"]:
+                return
+
             guild = self.bot.get_guild(int(data["guild_id"]))
             user_id = int(data["user"]["id"])
 
@@ -527,6 +530,9 @@ class Chat(cmd.Cog):
                 await member.edit(nick=new_nick)
 
         if event["t"] == "GUILD_MEMBER_REMOVE":
+            if data["user"]["bot"]:
+                return
+
             guild = self.bot.get_guild(int(data["guild_id"]))
             user_id = int(data["user"]["id"])
 
